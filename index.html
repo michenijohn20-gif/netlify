@@ -1057,9 +1057,13 @@
     setAuthLoading('btnSignIn', false);
 
     if (error) {
-      showAuthError(error.message === 'Invalid login credentials'
-        ? 'Wrong email or password. Please try again.'
-        : error.message);
+      if (error.message === 'Invalid login credentials') {
+  showAuthError('No account found with that email, or your password is incorrect. Please check and try again or create a new account.');
+} else if (error.message.includes('Email not confirmed')) {
+  showAuthError('Please check your email and click the confirmation link before signing in.');
+} else {
+  showAuthError(error.message);
+}
       return;
     }
 
