@@ -489,6 +489,52 @@
     .toast-icon { font-size: 1.2rem; }
     .toast-msg { font-size: 0.875rem; font-weight: 500; }
 
+    /* ── AUTH MODAL ── */
+    .auth-overlay {
+      position: fixed; inset: 0; z-index: 250;
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .auth-overlay.open { opacity: 1; pointer-events: all; }
+    .auth-box {
+      background: var(--deep); border: 1px solid var(--border);
+      border-radius: 14px; width: 90%; max-width: 420px;
+      padding: 40px 36px; position: relative;
+      transform: translateY(20px); transition: transform 0.3s;
+    }
+    .auth-overlay.open .auth-box { transform: none; }
+    .auth-logo { font-family: var(--font-display); font-size: 1.4rem; font-weight: 900; color: var(--gold); text-align: center; margin-bottom: 6px; }
+    .auth-logo span { color: var(--white); }
+    .auth-tagline { text-align: center; color: var(--muted); font-size: 0.85rem; margin-bottom: 28px; }
+    .auth-tabs { display: flex; background: var(--card); border-radius: 8px; padding: 4px; margin-bottom: 28px; gap: 4px; }
+    .auth-tab { flex: 1; padding: 9px; border-radius: 6px; border: none; background: none; color: var(--muted); font-family: var(--font-body); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .auth-tab.active { background: var(--deep); color: var(--white); font-weight: 600; }
+    .auth-field { margin-bottom: 16px; }
+    .auth-field label { display: block; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+    .auth-field input { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 7px; padding: 12px 14px; color: var(--white); font-family: var(--font-body); font-size: 0.95rem; outline: none; transition: border-color 0.2s; }
+    .auth-field input:focus { border-color: var(--gold); }
+    .auth-field input::placeholder { color: var(--muted); }
+    .auth-submit { width: 100%; background: var(--gold); color: var(--black); border: none; border-radius: 7px; padding: 14px; font-family: var(--font-body); font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 8px; transition: transform 0.2s, box-shadow 0.2s; }
+    .auth-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(232,201,109,0.3); }
+    .auth-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .auth-error { background: rgba(232,93,93,0.1); border: 1px solid rgba(232,93,93,0.3); color: var(--red); border-radius: 6px; padding: 10px 14px; font-size: 0.83rem; margin-bottom: 14px; display: none; }
+    .auth-error.show { display: block; }
+    .auth-success { background: rgba(78,203,113,0.1); border: 1px solid rgba(78,203,113,0.3); color: var(--green); border-radius: 6px; padding: 10px 14px; font-size: 0.83rem; margin-bottom: 14px; display: none; text-align: center; }
+    .auth-success.show { display: block; }
+    .auth-close { position: absolute; top: 16px; right: 20px; background: none; border: none; color: var(--muted); font-size: 1.3rem; cursor: pointer; transition: color 0.2s; line-height: 1; }
+    .auth-close:hover { color: var(--white); }
+    /* ── USER MENU ── */
+    .user-menu { position: relative; }
+    .user-btn { display: flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px 6px 6px; cursor: pointer; transition: border-color 0.2s; color: var(--white); font-family: var(--font-body); font-size: 0.85rem; font-weight: 500; }
+    .user-btn:hover { border-color: rgba(255,255,255,0.2); }
+    .user-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--gold); color: var(--black); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
+    .user-dropdown { position: absolute; top: calc(100% + 8px); right: 0; background: var(--card); border: 1px solid var(--border); border-radius: 10px; min-width: 180px; overflow: hidden; opacity: 0; pointer-events: none; transform: translateY(-6px); transition: all 0.2s; z-index: 200; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+    .user-dropdown.open { opacity: 1; pointer-events: all; transform: none; }
+    .user-dropdown a, .user-dropdown button { display: flex; align-items: center; gap: 10px; padding: 11px 16px; color: var(--white); text-decoration: none; font-size: 0.875rem; background: none; border: none; width: 100%; text-align: left; cursor: pointer; transition: background 0.15s; font-family: var(--font-body); }
+    .user-dropdown a:hover, .user-dropdown button:hover { background: rgba(255,255,255,0.05); }
+    .user-dropdown .signout-btn { color: var(--red); border-top: 1px solid var(--border); }
+
     @media (max-width: 900px) {
       nav { padding: 16px 20px; }
       .nav-links { display: none; }
@@ -515,7 +561,24 @@
     <li><a href="#venues">Venues</a></li>
     <li><a href="#">Artists</a></li>
     <li><a href="#">My Tickets</a></li>
-    <li><a href="#" class="nav-cta">Sign In</a></li>
+    <!-- Logged OUT: show Sign In button -->
+    <li id="navSignIn"><a href="#" class="nav-cta" onclick="openAuthModal(event)">Sign In</a></li>
+    <!-- Logged IN: show user menu (hidden by default) -->
+    <li id="navUser" style="display:none">
+      <div class="user-menu">
+        <button class="user-btn" onclick="toggleUserMenu()">
+          <div class="user-avatar" id="userAvatar">?</div>
+          <span id="userName">Account</span>
+          <span style="color:var(--muted);font-size:0.7rem">▾</span>
+        </button>
+        <div class="user-dropdown" id="userDropdown">
+          <a href="#">🎟 My Tickets</a>
+          <a href="#">👤 Profile</a>
+          <a href="#">❤️ Wishlist</a>
+          <button class="signout-btn" onclick="signOut()">↩ Sign Out</button>
+        </div>
+      </div>
+    </li>
   </ul>
 </nav>
 
@@ -796,6 +859,63 @@
   </div>
 </div>
 
+<!-- AUTH MODAL -->
+<div class="auth-overlay" id="authOverlay" onclick="closeAuthOnBg(event)">
+  <div class="auth-box">
+    <button class="auth-close" onclick="closeAuthModal()">✕</button>
+    <div class="auth-logo">Ticket<span>Vault</span></div>
+    <p class="auth-tagline">Your gateway to live experiences</p>
+
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabSignIn" onclick="switchTab('signin')">Sign In</button>
+      <button class="auth-tab" id="tabSignUp" onclick="switchTab('signup')">Create Account</button>
+    </div>
+
+    <!-- Error / Success messages -->
+    <div class="auth-error" id="authError"></div>
+    <div class="auth-success" id="authSuccess"></div>
+
+    <!-- SIGN IN FORM -->
+    <div id="formSignIn">
+      <div class="auth-field">
+        <label>Email</label>
+        <input type="email" id="siEmail" placeholder="you@example.com"/>
+      </div>
+      <div class="auth-field">
+        <label>Password</label>
+        <input type="password" id="siPassword" placeholder="Your password"
+               onkeydown="if(event.key==='Enter') handleSignIn()"/>
+      </div>
+      <button class="auth-submit" id="btnSignIn" onclick="handleSignIn()">Sign In</button>
+      <p style="text-align:center;color:var(--muted);font-size:0.8rem;margin-top:16px">
+        No account? <a href="#" style="color:var(--gold);text-decoration:none" onclick="switchTab('signup')">Create one free →</a>
+      </p>
+    </div>
+
+    <!-- SIGN UP FORM -->
+    <div id="formSignUp" style="display:none">
+      <div class="auth-field">
+        <label>Full Name</label>
+        <input type="text" id="suName" placeholder="Your full name"/>
+      </div>
+      <div class="auth-field">
+        <label>Email</label>
+        <input type="email" id="suEmail" placeholder="you@example.com"/>
+      </div>
+      <div class="auth-field">
+        <label>Password</label>
+        <input type="password" id="suPassword" placeholder="Min 6 characters"
+               onkeydown="if(event.key==='Enter') handleSignUp()"/>
+      </div>
+      <button class="auth-submit" id="btnSignUp" onclick="handleSignUp()">Create Account</button>
+      <p style="text-align:center;color:var(--muted);font-size:0.8rem;margin-top:16px">
+        Already have an account? <a href="#" style="color:var(--gold);text-decoration:none" onclick="switchTab('signin')">Sign in →</a>
+      </p>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast">
   <span class="toast-icon" id="toastIcon">✅</span>
@@ -803,20 +923,18 @@
 </div>
 
 <script>
-  // ── SUPABASE SETUP ──────────────────────────────────────────────
-  // IMPORTANT: Replace these two values with your own from Supabase
-  // Settings → Data API → Project URL and anon/public key
+  // ── SUPABASE SETUP ────────────────────────────────────────────────
   const supabaseClient = window.supabase.createClient(
-    'https://geukqojtcqpnjfxwnieq.supabase.co',  // ← paste your Project URL
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdldWtxb2p0Y3FwbmpmeHduaWVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDY4MjAsImV4cCI6MjA4OTA4MjgyMH0.LobxmGs6OjtDubYQYOBy6v9fle69ZnSzc9DW1MyC5YU'                           // ← paste your anon key
+    'https://geukqojtcqpnjfxwnieq.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdldWtxb2p0Y3FwbmpmeHduaWVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDY4MjAsImV4cCI6MjA4OTA4MjgyMH0.LobxmGs6OjtDubYQYOBy6v9fle69ZnSzc9DW1MyC5YU'
   );
 
-  // ── STATE ───────────────────────────────────────────────────────
-  let allEvents = [];       // stores all events loaded from database
+  // ── STATE ─────────────────────────────────────────────────────────
+  let allEvents     = [];
+  let currentUser   = null;
   let selectedPrice = 1500;
-  let qty = 1;
+  let qty           = 1;
 
-  // ── GRADIENTS (fallback when no image) ──────────────────────────
   const gradients = [
     'linear-gradient(135deg,#1a0533,#6a1faa)',
     'linear-gradient(135deg,#003322,#1a6644)',
@@ -829,9 +947,159 @@
     'linear-gradient(135deg,#2a1a00,#7a4a00)',
   ];
 
-  // ── LOAD EVENTS FROM SUPABASE ────────────────────────────────────
+  // ── AUTH STATE LISTENER ───────────────────────────────────────────
+  // This fires whenever a user signs in, signs out, or the page loads
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    currentUser = session?.user ?? null;
+    updateNavbar();
+  });
+
+  // ── NAVBAR: switch between Sign In button and User menu ──────────
+  function updateNavbar() {
+    const signInEl = document.getElementById('navSignIn');
+    const userEl   = document.getElementById('navUser');
+    if (currentUser) {
+      signInEl.style.display = 'none';
+      userEl.style.display   = 'block';
+      // Show first letter of email or name as avatar
+      const name  = currentUser.user_metadata?.full_name || currentUser.email;
+      const label = name.split(' ')[0]; // first name or email prefix
+      document.getElementById('userName').textContent  = label.split('@')[0];
+      document.getElementById('userAvatar').textContent = label[0].toUpperCase();
+    } else {
+      signInEl.style.display = 'block';
+      userEl.style.display   = 'none';
+    }
+  }
+
+  // ── USER DROPDOWN TOGGLE ─────────────────────────────────────────
+  function toggleUserMenu() {
+    document.getElementById('userDropdown').classList.toggle('open');
+  }
+  // Close dropdown when clicking outside
+  document.addEventListener('click', e => {
+    const menu = document.getElementById('userDropdown');
+    if (menu && !e.target.closest('.user-menu')) menu.classList.remove('open');
+  });
+
+  // ── SIGN OUT ─────────────────────────────────────────────────────
+  async function signOut() {
+    await supabaseClient.auth.signOut();
+    document.getElementById('userDropdown').classList.remove('open');
+    showToast('👋 Signed out successfully', 'var(--muted)');
+  }
+
+  // ── AUTH MODAL ───────────────────────────────────────────────────
+  function openAuthModal(e) {
+    if (e) e.preventDefault();
+    clearAuthMessages();
+    document.getElementById('authOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => document.getElementById('siEmail').focus(), 300);
+  }
+
+  function closeAuthModal() {
+    document.getElementById('authOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    clearAuthMessages();
+  }
+
+  function closeAuthOnBg(e) {
+    if (e.target === document.getElementById('authOverlay')) closeAuthModal();
+  }
+
+  function switchTab(tab) {
+    clearAuthMessages();
+    const isSignIn = tab === 'signin';
+    document.getElementById('tabSignIn').classList.toggle('active', isSignIn);
+    document.getElementById('tabSignUp').classList.toggle('active', !isSignIn);
+    document.getElementById('formSignIn').style.display = isSignIn ? 'block' : 'none';
+    document.getElementById('formSignUp').style.display = isSignIn ? 'none'  : 'block';
+    setTimeout(() => {
+      document.getElementById(isSignIn ? 'siEmail' : 'suName').focus();
+    }, 50);
+  }
+
+  function showAuthError(msg) {
+    const el = document.getElementById('authError');
+    el.textContent = msg; el.classList.add('show');
+    document.getElementById('authSuccess').classList.remove('show');
+  }
+
+  function showAuthSuccess(msg) {
+    const el = document.getElementById('authSuccess');
+    el.textContent = msg; el.classList.add('show');
+    document.getElementById('authError').classList.remove('show');
+  }
+
+  function clearAuthMessages() {
+    document.getElementById('authError').classList.remove('show');
+    document.getElementById('authSuccess').classList.remove('show');
+  }
+
+  function setAuthLoading(btnId, loading) {
+    const btn = document.getElementById(btnId);
+    btn.disabled = loading;
+    btn.textContent = loading ? 'Please wait…' : (btnId === 'btnSignIn' ? 'Sign In' : 'Create Account');
+  }
+
+  // ── SIGN IN ──────────────────────────────────────────────────────
+  async function handleSignIn() {
+    const email    = document.getElementById('siEmail').value.trim();
+    const password = document.getElementById('siPassword').value;
+    if (!email || !password) { showAuthError('Please fill in both fields.'); return; }
+
+    setAuthLoading('btnSignIn', true);
+    clearAuthMessages();
+
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+    setAuthLoading('btnSignIn', false);
+
+    if (error) {
+      showAuthError(error.message === 'Invalid login credentials'
+        ? 'Wrong email or password. Please try again.'
+        : error.message);
+      return;
+    }
+
+    closeAuthModal();
+    showToast('👋 Welcome back!', 'var(--green)');
+  }
+
+  // ── SIGN UP ──────────────────────────────────────────────────────
+  async function handleSignUp() {
+    const name     = document.getElementById('suName').value.trim();
+    const email    = document.getElementById('suEmail').value.trim();
+    const password = document.getElementById('suPassword').value;
+
+    if (!name || !email || !password) { showAuthError('Please fill in all fields.'); return; }
+    if (password.length < 6)          { showAuthError('Password must be at least 6 characters.'); return; }
+
+    setAuthLoading('btnSignUp', true);
+    clearAuthMessages();
+
+    const { error } = await supabaseClient.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: name } }
+    });
+
+    setAuthLoading('btnSignUp', false);
+
+    if (error) {
+      showAuthError(error.message); return;
+    }
+
+    showAuthSuccess('✅ Account created! Check your email to confirm, then sign in.');
+    // Clear the form fields
+    document.getElementById('suName').value     = '';
+    document.getElementById('suEmail').value    = '';
+    document.getElementById('suPassword').value = '';
+  }
+
+  // ── LOAD EVENTS ───────────────────────────────────────────────────
   async function loadEvents() {
-    // Show a loading state
     document.getElementById('eventsGrid').innerHTML =
       '<p style="color:var(--muted);grid-column:1/-1;text-align:center;padding:40px">Loading events…</p>';
 
@@ -859,13 +1127,10 @@
     renderEvents('all');
   }
 
-  // ── RENDER EVENTS ────────────────────────────────────────────────
+  // ── RENDER EVENTS ─────────────────────────────────────────────────
   function renderEvents(filter) {
-    const grid = document.getElementById('eventsGrid');
-
-    const filtered = filter === 'all'
-      ? allEvents
-      : allEvents.filter(e => e.category === filter);
+    const grid     = document.getElementById('eventsGrid');
+    const filtered = filter === 'all' ? allEvents : allEvents.filter(e => e.category === filter);
 
     if (filtered.length === 0) {
       grid.innerHTML = '<p style="color:var(--muted);grid-column:1/-1;text-align:center;padding:40px">No events in this category yet.</p>';
@@ -873,10 +1138,8 @@
     }
 
     grid.innerHTML = filtered.map((e, i) => {
-      // Work out availability label from ticket counts if available
-      const imgBg = gradients[i % gradients.length];
+      const imgBg   = gradients[i % gradients.length];
       const dateStr = e.date ? new Date(e.date).toLocaleDateString('en-KE', { day:'numeric', month:'short', year:'numeric' }) : '';
-
       return `
         <div class="event-card">
           <div class="card-img-wrap">
@@ -897,7 +1160,7 @@
             <div class="card-footer">
               <div class="card-price">From <strong>KES —</strong></div>
               <button class="card-btn"
-                onclick="openModal('${e.title.replace(/'/g,"\\'")}','${dateStr}','${e.venue.replace(/'/g,"\\'")}')">
+                onclick="handleGetTickets('${e.title.replace(/'/g,"\\'")}','${dateStr}','${e.venue.replace(/'/g,"\\'")}')">
                 Get Tickets
               </button>
             </div>
@@ -906,19 +1169,29 @@
     }).join('');
   }
 
-  // ── FILTER BY CATEGORY ───────────────────────────────────────────
+  // ── FILTER BY CATEGORY ────────────────────────────────────────────
   function filterCat(btn, cat) {
     document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
     btn.classList.add('active');
     renderEvents(cat);
   }
 
-  // ── MODAL ────────────────────────────────────────────────────────
+  // ── GET TICKETS (requires login) ──────────────────────────────────
+  function handleGetTickets(title, date, venue) {
+    if (!currentUser) {
+      // Not logged in — open auth modal first
+      openAuthModal(null);
+      showAuthError('Please sign in to purchase tickets.');
+      return;
+    }
+    openModal(title, date, venue);
+  }
+
+  // ── TICKET MODAL ──────────────────────────────────────────────────
   function openModal(title, date, venue) {
     document.getElementById('modalTitle').textContent = title;
-    document.getElementById('modalMeta').textContent = `${date} · ${venue}`;
-    qty = 1;
-    selectedPrice = 1500;
+    document.getElementById('modalMeta').textContent  = `${date} · ${venue}`;
+    qty = 1; selectedPrice = 1500;
     updateSummary();
     document.getElementById('modalOverlay').classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -949,25 +1222,25 @@
   function updateSummary() {
     const fee = Math.round(selectedPrice * 0.1);
     document.getElementById('priceRow').textContent = `KES ${selectedPrice.toLocaleString()}`;
-    document.getElementById('qtyRow').textContent = `× ${qty}`;
-    document.getElementById('feeRow').textContent = `KES ${(fee * qty).toLocaleString()}`;
+    document.getElementById('qtyRow').textContent   = `× ${qty}`;
+    document.getElementById('feeRow').textContent   = `KES ${(fee * qty).toLocaleString()}`;
     document.getElementById('totalRow').textContent = `KES ${((selectedPrice + fee) * qty).toLocaleString()}`;
   }
 
-  // ── CHECKOUT ─────────────────────────────────────────────────────
   function checkout() {
     closeModal();
     showToast('🎉 Tickets reserved! Redirecting to payment…', 'var(--green)');
   }
 
-  // ── FAVOURITES ───────────────────────────────────────────────────
+  // ── FAVOURITES ────────────────────────────────────────────────────
   function toggleFav(btn) {
+    if (!currentUser) { openAuthModal(null); showAuthError('Sign in to save events to your wishlist.'); return; }
     btn.textContent = btn.textContent === '♡' ? '♥' : '♡';
     btn.style.color = btn.textContent === '♥' ? 'var(--red)' : '';
     if (btn.textContent === '♥') showToast('❤️ Added to your wishlist', 'var(--red)');
   }
 
-  // ── TOAST NOTIFICATION ───────────────────────────────────────────
+  // ── TOAST ─────────────────────────────────────────────────────────
   function showToast(msg, color='var(--green)') {
     const t = document.getElementById('toast');
     document.getElementById('toastMsg').textContent = msg;
@@ -976,7 +1249,7 @@
     setTimeout(() => t.classList.remove('show'), 3000);
   }
 
-  // ── INIT: load events when page is ready ─────────────────────────
+  // ── INIT ──────────────────────────────────────────────────────────
   loadEvents();
 </script>
 </body>
