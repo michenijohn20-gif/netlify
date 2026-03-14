@@ -249,10 +249,11 @@
       display: block; position: relative;
     }
     .card-img-wrap {
-      position: relative; overflow: hidden; height: 200px;
+      position: relative; overflow: hidden; height: 220px;
+      background: #0d0d14;
     }
-    .card-img-wrap img { width:100%; height:100%; object-fit:cover; transition: transform 0.4s; }
-    .event-card:hover .card-img-wrap img { transform: scale(1.06); }
+    .card-img-wrap img { width:100%; height:100%; object-fit:contain; transition: transform 0.4s; }
+    .event-card:hover .card-img-wrap img { transform: scale(1.03); }
     .card-badge {
       position: absolute; top: 14px; left: 14px;
       background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
@@ -935,37 +936,8 @@
     </div>
     <div class="modal-body">
       <p style="font-weight:600;margin-bottom:14px">Select Ticket Type</p>
-      <div class="ticket-types">
-        <div class="ticket-type selected" onclick="selectTicket(this, 1500)">
-          <div>
-            <div class="tt-name">General Admission</div>
-            <div class="tt-desc">Standing area · Doors open 6:00 PM</div>
-          </div>
-          <div class="tt-right">
-            <div class="tt-price" id="t1price">KES 1,500</div>
-            <div class="tt-avail">340 left</div>
-          </div>
-        </div>
-        <div class="ticket-type" onclick="selectTicket(this, 3500)">
-          <div>
-            <div class="tt-name">VIP Standing</div>
-            <div class="tt-desc">Front section + free drink · Priority entry</div>
-          </div>
-          <div class="tt-right">
-            <div class="tt-price">KES 3,500</div>
-            <div class="tt-avail" style="color:#e8a84d">42 left</div>
-          </div>
-        </div>
-        <div class="ticket-type" onclick="selectTicket(this, 6500)">
-          <div>
-            <div class="tt-name">Premium Table (x4)</div>
-            <div class="tt-desc">Reserved table · Bottle service · VIP lounge</div>
-          </div>
-          <div class="tt-right">
-            <div class="tt-price">KES 6,500</div>
-            <div class="tt-avail" style="color:var(--red)">8 left!</div>
-          </div>
-        </div>
+      <div class="ticket-types" id="ticketTypesContainer">
+        <div style="color:var(--muted);text-align:center;padding:20px;font-size:0.875rem">Loading ticket types…</div>
       </div>
       <div class="qty-row">
         <span class="qty-label">Quantity</span>
@@ -1398,17 +1370,77 @@
     }
     currentEventId    = eventId;
     currentEventTitle = title;
-    openModal(title, date, venue);
+    openModal(eventId, title, date, venue);
   }
 
   // ── TICKET MODAL ──────────────────────────────────────────────────
-  function openModal(title, date, venue) {
+  async function openModal(eventId, title, date, venue) {
     document.getElementById('modalTitle').textContent = title;
     document.getElementById('modalMeta').textContent  = `${date} · ${venue}`;
-    qty = 1; selectedPrice = 1500;
+    qty = 1; selectedPrice = 0;
+
+    // Show loading state
+    document.getElementById('ticketTypesContainer').innerHTML =
+      '<div style="color:var(--muted);text-align:center;padding:20px;font-size:0.875rem">Loading ticket types…</div>';
     updateSummary();
+
     document.getElementById('modalOverlay').classList.add('open');
     document.body.style.overflow = 'hidden';
+
+    // Load ticket types from Supabase
+    if (eventId) {
+      const { data: types, error } = await supabaseClient
+        .from('ticket_types')
+        .select('*')
+        .eq('event_id', eventId)
+        .order('price', { ascending: true });
+
+      if (error || !types || types.length === 0) {
+        document.getElementById('ticketTypesContainer').innerHTML =
+          '<div style="color:var(--muted);text-align:center;padding:20px;font-size:0.875rem">No ticket types set up for this event yet.</div>';
+        return;
+      }
+
+      renderTicketTypes(types);
+    } else {
+      // Featured event fallback — no event id
+      document.getElementById('ticketTypesContainer').innerHTML =
+        '<div style="color:var(--muted);text-align:center;padding:20px;font-size:0.875rem">Ticket information coming soon.</div>';
+    }
+  }
+
+  function renderTicketTypes(types) {
+    const container = document.getElementById('ticketTypesContainer');
+    container.innerHTML = types.map((t, i) => {
+      const sold      = t.quantity_sold || 0;
+      const remaining = t.quantity_total - sold;
+      const isSoldOut = remaining <= 0;
+      const isLow     = remaining > 0 && remaining <= 10;
+      const availColor = isSoldOut ? 'var(--red)' : isLow ? '#e8a84d' : 'var(--muted)';
+      const availText  = isSoldOut ? 'Sold out' : isLow ? `${remaining} left!` : `${remaining} available`;
+
+      return `
+        <div class="ticket-type ${i === 0 && !isSoldOut ? 'selected' : ''} ${isSoldOut ? 'sold-out' : ''}"
+             onclick="${isSoldOut ? '' : `selectTicket(this, ${t.price}, '${t.id}')`}"
+             style="${isSoldOut ? 'opacity:0.5;cursor:not-allowed' : 'cursor:pointer'}">
+          <div>
+            <div class="tt-name">${t.name}</div>
+            <div class="tt-desc">${t.description || ''}</div>
+          </div>
+          <div class="tt-right">
+            <div class="tt-price">KES ${Number(t.price).toLocaleString()}</div>
+            <div class="tt-avail" style="color:${availColor}">${availText}</div>
+          </div>
+        </div>`;
+    }).join('');
+
+    // Auto-select first available ticket
+    const firstAvailable = types.find(t => (t.quantity_total - (t.quantity_sold || 0)) > 0);
+    if (firstAvailable) {
+      selectedPrice    = firstAvailable.price;
+      selectedTicketId = firstAvailable.id;
+      updateSummary();
+    }
   }
 
   function closeModal() {
@@ -1420,10 +1452,13 @@
     if (e.target === document.getElementById('modalOverlay')) closeModal();
   }
 
-  function selectTicket(el, price) {
+  let selectedTicketId = null;
+
+  function selectTicket(el, price, ticketTypeId) {
     document.querySelectorAll('.ticket-type').forEach(t => t.classList.remove('selected'));
     el.classList.add('selected');
-    selectedPrice = price;
+    selectedPrice    = price;
+    selectedTicketId = ticketTypeId;
     updateSummary();
   }
 
@@ -1435,10 +1470,10 @@
 
   function updateSummary() {
     const fee = Math.round(selectedPrice * 0.1);
-    document.getElementById('priceRow').textContent = `KES ${selectedPrice.toLocaleString()}`;
+    document.getElementById('priceRow').textContent = selectedPrice ? `KES ${Number(selectedPrice).toLocaleString()}` : '—';
     document.getElementById('qtyRow').textContent   = `× ${qty}`;
-    document.getElementById('feeRow').textContent   = `KES ${(fee * qty).toLocaleString()}`;
-    document.getElementById('totalRow').textContent = `KES ${((selectedPrice + fee) * qty).toLocaleString()}`;
+    document.getElementById('feeRow').textContent   = selectedPrice ? `KES ${(fee * qty).toLocaleString()}` : '—';
+    document.getElementById('totalRow').textContent = selectedPrice ? `KES ${((Number(selectedPrice) + fee) * qty).toLocaleString()}` : '—';
   }
 
   // ── CHECKOUT WITH PAYSTACK ────────────────────────────────────────
@@ -1450,34 +1485,53 @@
       return;
     }
 
+    if (!selectedPrice || selectedPrice === 0) {
+      showToast('Please select a ticket type first.', 'var(--red)');
+      return;
+    }
+
     var fee      = Math.round(selectedPrice * 0.1);
-    var total    = (selectedPrice + fee) * qty;
+    var total    = (Number(selectedPrice) + fee) * qty;
     var txRef    = 'TV-' + Date.now() + '-' + Math.random().toString(36).substr(2,6).toUpperCase();
     var snapQty  = qty;
     var snapId   = currentEventId;
     var snapName = currentEventTitle;
+    var snapTid  = selectedTicketId;
 
     closeModal();
 
     function paystackCallback(response) {
       showToast('Processing your booking…', 'var(--gold)');
       supabaseClient.from('bookings').insert({
-        user_id:      currentUser.id,
-        event_id:     snapId || null,
-        quantity:     snapQty,
-        total_amount: total,
-        status:       'confirmed',
-        qr_code:      'QR-' + response.reference,
+        user_id:        currentUser.id,
+        event_id:       snapId  || null,
+        ticket_type_id: snapTid || null,
+        quantity:       snapQty,
+        total_amount:   total,
+        status:         'confirmed',
+        qr_code:        'QR-' + response.reference,
       }).then(function(result) {
         if (result.error) {
           console.error('Booking error:', result.error.message);
           showToast('Payment received but booking failed to save. Contact support.', 'var(--red)');
         } else {
+          // Increment quantity_sold on ticket_type
+          if (snapTid) {
+            supabaseClient.from('ticket_types')
+              .select('quantity_sold').eq('id', snapTid).single()
+              .then(function(r) {
+                if (r.data) {
+                  supabaseClient.from('ticket_types')
+                    .update({ quantity_sold: (r.data.quantity_sold || 0) + snapQty })
+                    .eq('id', snapTid);
+                }
+              });
+          }
           showToast('🎉 Tickets confirmed! Check My Tickets.', 'var(--green)');
         }
       });
       currentEventId = null; currentEventTitle = null;
-      qty = 1; selectedPrice = 1500;
+      qty = 1; selectedPrice = 0; selectedTicketId = null;
     }
 
     function paystackOnClose() {
@@ -1809,6 +1863,7 @@
               <td><span class="pub-badge ${e.is_published?'yes':'no'}">${e.is_published?'Published':'Draft'}</span></td>
               <td>
                 <button class="admin-action-btn" onclick="openEventForm('${e.id}')">✏️ Edit</button>
+                <button class="admin-action-btn" onclick="openTicketMgr('${e.id}','${e.title.replace(/'/g,"\\'")}')">🎟 Tickets</button>
                 <button class="admin-action-btn publish" onclick="togglePublish('${e.id}',${e.is_published})">${e.is_published?'🔒 Unpublish':'✅ Publish'}</button>
                 <button class="admin-action-btn danger" onclick="confirmDelete('${e.id}','${e.title.replace(/'/g,"\\'")}')">🗑 Delete</button>
               </td>
@@ -1916,6 +1971,95 @@
   function closeConfirm() {
     document.getElementById('adminConfirmOverlay').classList.remove('open');
     deleteEventId = null;
+  }
+
+  // ── TICKET TYPES MANAGER ──────────────────────────────────────────
+  let tmgrEventId = null;
+
+  async function openTicketMgr(eventId, eventName) {
+    tmgrEventId = eventId;
+    document.getElementById('tmgrEventName').textContent = eventName;
+    document.getElementById('tmgrMsg').textContent = '';
+    // Clear add form
+    ['ttName','ttDesc','ttPrice','ttQtyTotal'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('ttQtySold').value = '0';
+    document.getElementById('ticketMgrOverlay').classList.add('open');
+    loadTicketTypes();
+  }
+
+  function closeTicketMgr() {
+    document.getElementById('ticketMgrOverlay').classList.remove('open');
+    tmgrEventId = null;
+  }
+
+  async function loadTicketTypes() {
+    const list = document.getElementById('tmgrList');
+    list.innerHTML = '<div style="color:var(--muted);font-size:0.875rem;padding:8px 0">Loading…</div>';
+    const { data, error } = await supabaseClient
+      .from('ticket_types').select('*')
+      .eq('event_id', tmgrEventId)
+      .order('price', { ascending: true });
+
+    if (error || !data || data.length === 0) {
+      list.innerHTML = '<div style="color:var(--muted);font-size:0.875rem;padding:8px 0">No ticket types yet. Add one below.</div>';
+      return;
+    }
+
+    list.innerHTML = data.map(t => {
+      const remaining = t.quantity_total - (t.quantity_sold || 0);
+      return `
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:12px">
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:600;font-size:0.9rem;margin-bottom:2px">${t.name}</div>
+            <div style="font-size:0.78rem;color:var(--muted)">${t.description || ''}</div>
+            <div style="font-size:0.78rem;color:var(--muted);margin-top:3px">
+              ${t.quantity_sold||0} sold · ${remaining} remaining of ${t.quantity_total}
+            </div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--gold)">KES ${Number(t.price).toLocaleString()}</div>
+            <button class="admin-action-btn danger" style="margin-top:6px;margin-right:0" onclick="deleteTicketType('${t.id}')">🗑 Remove</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  async function addTicketType() {
+    const msg      = document.getElementById('tmgrMsg');
+    const name     = document.getElementById('ttName').value.trim();
+    const price    = parseFloat(document.getElementById('ttPrice').value);
+    const qtyTotal = parseInt(document.getElementById('ttQtyTotal').value);
+    const qtySold  = parseInt(document.getElementById('ttQtySold').value) || 0;
+    const desc     = document.getElementById('ttDesc').value.trim();
+
+    if (!name || !price || !qtyTotal) {
+      msg.textContent = '⚠️ Name, price and total tickets are required.';
+      msg.style.color = 'var(--red)'; return;
+    }
+
+    msg.textContent = 'Saving…'; msg.style.color = 'var(--muted)';
+
+    const { error } = await supabaseClient.from('ticket_types').insert({
+      event_id:       tmgrEventId,
+      name, description: desc || null,
+      price, quantity_total: qtyTotal, quantity_sold: qtySold,
+    });
+
+    if (error) {
+      msg.textContent = '❌ ' + error.message; msg.style.color = 'var(--red)';
+    } else {
+      msg.textContent = '✅ Ticket type added!'; msg.style.color = 'var(--green)';
+      ['ttName','ttDesc','ttPrice','ttQtyTotal'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('ttQtySold').value = '0';
+      loadTicketTypes();
+      setTimeout(() => msg.textContent = '', 2500);
+    }
+  }
+
+  async function deleteTicketType(id) {
+    await supabaseClient.from('ticket_types').delete().eq('id', id);
+    showToast('Ticket type removed', 'var(--muted)');
+    loadTicketTypes();
   }
 </script>
 <!-- ── ADMIN DASHBOARD ── -->
@@ -2043,6 +2187,46 @@
     <div class="admin-confirm-btns">
       <button class="admin-confirm-no"  onclick="closeConfirm()">Cancel</button>
       <button class="admin-confirm-yes" id="adminConfirmYes">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TICKET TYPES MANAGER ── -->
+<div class="admin-form-overlay" id="ticketMgrOverlay" onclick="if(event.target===this)closeTicketMgr()">
+  <div class="admin-form-box" style="max-width:700px">
+    <button style="position:absolute;top:16px;right:20px;background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer" onclick="closeTicketMgr()">✕</button>
+    <div class="admin-form-title">🎟 Ticket Types — <span id="tmgrEventName" style="color:var(--gold)"></span></div>
+
+    <!-- Existing types list -->
+    <div id="tmgrList" style="margin-bottom:24px"></div>
+
+    <!-- Add new type form -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px">
+      <p style="font-weight:600;font-size:0.85rem;margin-bottom:14px;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px">Add Ticket Type</p>
+      <div class="admin-form-grid">
+        <div class="admin-form-field">
+          <label>Name *</label>
+          <input type="text" id="ttName" placeholder="e.g. VIP Standing"/>
+        </div>
+        <div class="admin-form-field">
+          <label>Price (KES) *</label>
+          <input type="number" id="ttPrice" placeholder="e.g. 3500" min="0"/>
+        </div>
+        <div class="admin-form-field">
+          <label>Total Tickets *</label>
+          <input type="number" id="ttQtyTotal" placeholder="e.g. 200" min="1"/>
+        </div>
+        <div class="admin-form-field">
+          <label>Tickets Sold</label>
+          <input type="number" id="ttQtySold" placeholder="0" min="0" value="0"/>
+        </div>
+        <div class="admin-form-field full">
+          <label>Description</label>
+          <input type="text" id="ttDesc" placeholder="e.g. Front section + free drink · Priority entry"/>
+        </div>
+      </div>
+      <button class="admin-save-btn" style="margin-top:14px" onclick="addTicketType()">＋ Add Ticket Type</button>
+      <p id="tmgrMsg" style="font-size:0.82rem;margin-top:10px;min-height:18px;text-align:center"></p>
     </div>
   </div>
 </div>
