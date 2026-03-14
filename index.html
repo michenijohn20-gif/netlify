@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TicketVault — Live Events</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --deep: #111118;
+      --card: #16161f;
+      --border: rgba(255,255,255,0.07);
+      --gold: #e8c96d;
+      --gold-dim: #a8893d;
+      --white: #f5f3ee;
+      --muted: #7a7a8a;
+      --red: #e85d5d;
+      --green: #4ecb71;
+      --font-display: 'Playfair Display', serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 9999; opacity: 0.4;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 48px;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.95), transparent);
+      backdrop-filter: blur(8px);
+    }
+    .logo {
+      font-family: var(--font-display);
+      font-size: 1.5rem; font-weight: 900;
+      color: var(--gold); letter-spacing: -0.5px;
+      text-decoration: none;
+    }
+    .logo span { color: var(--white); }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 0.875rem;
+      font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-cta {
+      background: var(--gold); color: var(--black) !important;
+      padding: 8px 20px; border-radius: 4px; font-weight: 600 !important;
+    }
+    .nav-cta:hover { background: #f0d47a !important; color: var(--black) !important; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 0 48px 80px;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 60% 40%, rgba(232,201,109,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 50% at 20% 80%, rgba(78,203,113,0.06) 0%, transparent 60%),
+        linear-gradient(160deg, #0a0a0a 0%, #111118 50%, #0d0d15 100%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(232,201,109,0.1); border: 1px solid rgba(232,201,109,0.3);
+      color: var(--gold); padding: 6px 14px; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 1.5px;
+      text-transform: uppercase; margin-bottom: 28px;
+      animation: fadeUp 0.8s ease both;
+    }
+    .hero-tag::before { content: '●'; font-size: 0.5rem; animation: pulse 2s ease infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 900; line-height: 0.95;
+      letter-spacing: -3px;
+      max-width: 800px;
+      animation: fadeUp 0.8s 0.1s ease both;
+    }
+    .hero h1 em { color: var(--gold); font-style: italic; }
+    .hero-sub {
+      max-width: 480px; color: var(--muted);
+      font-size: 1.05rem; font-weight: 300;
+      margin: 28px 0 44px;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+    .hero-actions {
+      display: flex; gap: 16px; align-items: center;
+      animation: fadeUp 0.8s 0.3s ease both;
+    }
+    .btn-primary {
+      background: var(--gold); color: var(--black);
+      padding: 14px 32px; border-radius: 4px;
+      font-family: var(--font-body); font-weight: 700;
+      font-size: 0.95rem; letter-spacing: 0.3px;
+      border: none; cursor: pointer; text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: inline-block;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(232,201,109,0.3); }
+    .btn-ghost {
+      color: var(--white); padding: 14px 28px;
+      border: 1px solid var(--border); border-radius: 4px;
+      font-weight: 500; font-size: 0.95rem;
+      text-decoration: none; transition: border-color 0.2s, background 0.2s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
+    .hero-stats {
+      position: absolute; right: 48px; bottom: 80px;
+      display: flex; flex-direction: column; gap: 24px; text-align: right;
+      animation: fadeUp 0.8s 0.4s ease both;
+    }
+    .stat-num {
+      font-family: var(--font-display); font-size: 2.5rem;
+      font-weight: 700; color: var(--white); line-height: 1;
+    }
+    .stat-num span { color: var(--gold); }
+    .stat-label { font-size: 0.75rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
+
+    /* ── SEARCH BAR ── */
+    .search-section {
+      padding: 0 48px;
+      margin-top: -30px;
+      position: relative; z-index: 10;
+    }
+    .search-bar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 28px;
+      display: flex; gap: 16px; align-items: center;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    }
+    .search-field {
+      flex: 1; display: flex; flex-direction: column; gap: 4px;
+      border-right: 1px solid var(--border); padding-right: 20px;
+    }
+    .search-field:last-of-type { border-right: none; }
+    .search-field label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); }
+    .search-field input, .search-field select {
+      background: none; border: none; outline: none;
+      color: var(--white); font-family: var(--font-body);
+      font-size: 0.95rem; font-weight: 500;
+    }
+    .search-field select option { background: var(--card); }
+    .search-btn {
+      background: var(--gold); color: var(--black);
+      border: none; padding: 14px 28px; border-radius: 6px;
+      font-weight: 700; font-size: 0.9rem; cursor: pointer;
+      white-space: nowrap; transition: transform 0.2s;
+    }
+    .search-btn:hover { transform: scale(1.03); }
+
+    /* ── SECTION HEADERS ── */
+    section { padding: 80px 48px; }
+    .section-label {
+      font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--gold); font-weight: 600; margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 800; letter-spacing: -1.5px; line-height: 1.05;
+    }
+    .section-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 48px;
+    }
+    .view-all {
+      color: var(--gold); text-decoration: none;
+      font-size: 0.85rem; font-weight: 600; letter-spacing: 0.5px;
+      border-bottom: 1px solid rgba(232,201,109,0.3);
+      padding-bottom: 2px; transition: border-color 0.2s;
+    }
+    .view-all:hover { border-color: var(--gold); }
+
+    /* ── CATEGORY PILLS ── */
+    .categories {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 40px;
+    }
+    .cat-pill {
+      padding: 8px 18px; border-radius: 20px;
+      border: 1px solid var(--border); background: none;
+      color: var(--muted); font-family: var(--font-body);
+      font-size: 0.82rem; font-weight: 500; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .cat-pill:hover, .cat-pill.active {
+      background: var(--gold); color: var(--black);
+      border-color: var(--gold); font-weight: 600;
+    }
+
+    /* ── EVENT CARDS ── */
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+    }
+    .event-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    .event-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 48px rgba(0,0,0,0.5);
+    }
+    .card-img {
+      width: 100%; height: 200px; object-fit: cover;
+      display: block; position: relative;
+    }
+    .card-img-wrap {
+      position: relative; overflow: hidden; height: 200px;
+    }
+    .card-img-wrap img { width:100%; height:100%; object-fit:cover; transition: transform 0.4s; }
+    .event-card:hover .card-img-wrap img { transform: scale(1.06); }
+    .card-badge {
+      position: absolute; top: 14px; left: 14px;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+      color: var(--gold); font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 4px;
+      border: 1px solid rgba(232,201,109,0.3);
+    }
+    .card-fav {
+      position: absolute; top: 14px; right: 14px;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);
+      border: 1px solid var(--border); border-radius: 50%;
+      width: 34px; height: 34px; display: flex;
+      align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1rem; transition: all 0.2s;
+    }
+    .card-fav:hover { background: rgba(232,201,109,0.2); border-color: var(--gold); }
+    .card-body { padding: 20px; }
+    .card-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 10px;
+    }
+    .card-date { font-size: 0.78rem; color: var(--gold); font-weight: 600; letter-spacing: 0.5px; }
+    .card-avail { font-size: 0.75rem; color: var(--muted); }
+    .card-avail.sold { color: var(--red); }
+    .card-avail.low { color: #e8a84d; }
+    .card-title {
+      font-family: var(--font-display); font-size: 1.2rem;
+      font-weight: 700; line-height: 1.2; margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+    .card-venue {
+      font-size: 0.82rem; color: var(--muted);
+      display: flex; align-items: center; gap: 5px; margin-bottom: 18px;
+    }
+    .card-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 16px; border-top: 1px solid var(--border);
+    }
+    .card-price { font-size: 0.82rem; color: var(--muted); }
+    .card-price strong { color: var(--white); font-size: 1.1rem; font-family: var(--font-display); }
+    .card-btn {
+      background: none; border: 1px solid var(--border);
+      color: var(--white); padding: 7px 16px; border-radius: 4px;
+      font-family: var(--font-body); font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .card-btn:hover { background: var(--gold); color: var(--black); border-color: var(--gold); }
+
+    /* ── FEATURED BANNER ── */
+    .featured-banner {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+      display: grid; grid-template-columns: 1fr 1fr;
+      min-height: 420px;
+    }
+    .featured-img {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      position: relative; display: flex; align-items: center; justify-content: center;
+      font-size: 6rem; overflow: hidden;
+    }
+    .featured-img::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent 60%, var(--card) 100%);
+    }
+    .featured-content {
+      padding: 52px 48px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .featured-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--gold); font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px;
+    }
+    .featured-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 900; letter-spacing: -1px; line-height: 1.05;
+      margin-bottom: 16px;
+    }
+    .featured-desc { color: var(--muted); font-size: 0.95rem; margin-bottom: 32px; line-height: 1.7; }
+    .featured-info {
+      display: flex; gap: 28px; margin-bottom: 36px;
+    }
+    .feat-info-item { display: flex; flex-direction: column; gap: 3px; }
+    .feat-info-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .feat-info-val { font-weight: 600; font-size: 0.95rem; }
+
+    /* ── VENUES ── */
+    .venues-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    }
+    .venue-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 24px 20px; text-align: center;
+      transition: transform 0.2s, border-color 0.2s; cursor: pointer;
+    }
+    .venue-card:hover { transform: translateY(-4px); border-color: rgba(232,201,109,0.3); }
+    .venue-icon { font-size: 2.4rem; margin-bottom: 12px; }
+    .venue-name { font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+    .venue-city { font-size: 0.8rem; color: var(--muted); }
+    .venue-count { font-size: 0.75rem; color: var(--gold); font-weight: 600; margin-top: 8px; }
+
+    /* ── TICKET MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--deep); border: 1px solid var(--border);
+      border-radius: 12px; width: 90%; max-width: 680px;
+      max-height: 90vh; overflow-y: auto;
+      transform: translateY(24px); transition: transform 0.3s;
+    }
+    .modal-overlay.open .modal { transform: none; }
+    .modal-header {
+      padding: 28px 32px 0;
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .modal-close {
+      background: none; border: none; color: var(--muted);
+      font-size: 1.4rem; cursor: pointer; transition: color 0.2s; line-height: 1;
+    }
+    .modal-close:hover { color: var(--white); }
+    .modal-body { padding: 24px 32px 32px; }
+    .ticket-types { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+    .ticket-type {
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 18px 20px;
+      display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer; transition: border-color 0.2s, background 0.2s;
+    }
+    .ticket-type:hover, .ticket-type.selected {
+      border-color: var(--gold); background: rgba(232,201,109,0.05);
+    }
+    .tt-name { font-weight: 600; margin-bottom: 3px; }
+    .tt-desc { font-size: 0.8rem; color: var(--muted); }
+    .tt-right { text-align: right; }
+    .tt-price { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: var(--gold); }
+    .tt-avail { font-size: 0.75rem; color: var(--muted); }
+    .qty-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 0; border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border); margin-bottom: 24px;
+    }
+    .qty-label { font-weight: 500; }
+    .qty-ctrl { display: flex; align-items: center; gap: 16px; }
+    .qty-btn {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 1px solid var(--border); background: none;
+      color: var(--white); font-size: 1.1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .qty-btn:hover { border-color: var(--gold); background: rgba(232,201,109,0.1); }
+    .qty-num { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; min-width: 24px; text-align: center; }
+    .order-summary { background: var(--card); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .order-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.88rem; }
+    .order-row:last-child { margin: 0; padding-top: 10px; border-top: 1px solid var(--border); font-weight: 700; font-size: 1rem; }
+    .order-row .label { color: var(--muted); }
+
+    /* ── NEWSLETTER ── */
+    .newsletter {
+      background: linear-gradient(135deg, rgba(232,201,109,0.08) 0%, rgba(78,203,113,0.05) 100%);
+      border: 1px solid rgba(232,201,109,0.15);
+      border-radius: 12px; padding: 60px 48px; text-align: center;
+      margin: 0 48px 80px;
+    }
+    .newsletter h2 {
+      font-family: var(--font-display); font-size: 2.4rem;
+      font-weight: 800; letter-spacing: -1px; margin-bottom: 12px;
+    }
+    .newsletter p { color: var(--muted); margin-bottom: 32px; }
+    .newsletter-form {
+      display: flex; gap: 12px; max-width: 480px; margin: 0 auto;
+    }
+    .newsletter-form input {
+      flex: 1; background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: 12px 18px; color: var(--white);
+      font-family: var(--font-body); font-size: 0.95rem; outline: none;
+      transition: border-color 0.2s;
+    }
+    .newsletter-form input:focus { border-color: var(--gold); }
+    .newsletter-form input::placeholder { color: var(--muted); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--deep); border-top: 1px solid var(--border);
+      padding: 60px 48px 32px;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px; margin-bottom: 48px;
+    }
+    .footer-brand .logo { font-size: 1.6rem; display: block; margin-bottom: 14px; }
+    .footer-brand p { color: var(--muted); font-size: 0.875rem; line-height: 1.7; max-width: 280px; }
+    .footer-col h4 {
+      font-size: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 16px; font-weight: 600;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col a { color: var(--white); text-decoration: none; font-size: 0.875rem; opacity: 0.7; transition: opacity 0.2s; }
+    .footer-col a:hover { opacity: 1; }
+    .footer-bottom {
+      border-top: 1px solid var(--border); padding-top: 24px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-bottom p { font-size: 0.8rem; color: var(--muted); }
+    .social-links { display: flex; gap: 12px; }
+    .social-btn {
+      width: 36px; height: 36px; border-radius: 6px;
+      border: 1px solid var(--border); background: none;
+      color: var(--muted); font-size: 0.9rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; text-decoration: none;
+    }
+    .social-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── NOTIFICATION TOAST ── */
+    .toast {
+      position: fixed; bottom: 32px; right: 32px; z-index: 300;
+      background: var(--card); border: 1px solid var(--border);
+      border-left: 3px solid var(--green);
+      border-radius: 8px; padding: 16px 20px;
+      display: flex; align-items: center; gap: 12px;
+      transform: translateY(20px); opacity: 0;
+      transition: all 0.3s; pointer-events: none;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .toast.show { transform: none; opacity: 1; }
+    .toast-icon { font-size: 1.2rem; }
+    .toast-msg { font-size: 0.875rem; font-weight: 500; }
+
+    @media (max-width: 900px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      .hero { padding: 0 20px 60px; }
+      .hero-stats { display: none; }
+      section, .search-section { padding-left: 20px; padding-right: 20px; }
+      .featured-banner { grid-template-columns: 1fr; }
+      .featured-img { height: 200px; }
+      .venues-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .newsletter { margin: 0 20px 60px; padding: 40px 20px; }
+      .newsletter-form { flex-direction: column; }
+      footer { padding: 40px 20px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="#" class="logo">Ticket<span>Vault</span></a>
+  <ul class="nav-links">
+    <li><a href="#events">Events</a></li>
+    <li><a href="#venues">Venues</a></li>
+    <li><a href="#">Artists</a></li>
+    <li><a href="#">My Tickets</a></li>
+    <li><a href="#" class="nav-cta">Sign In</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-tag">Now Live — 2026 Season</div>
+  <h1>Every<br/><em>Live</em><br/>Moment.</h1>
+  <p class="hero-sub">Discover the world's most electrifying concerts, festivals, sports, and theatre. Your next unforgettable night starts here.</p>
+  <div class="hero-actions">
+    <a href="#events" class="btn-primary">Browse Events</a>
+    <a href="#" class="btn-ghost">▶ Watch Highlights</a>
+  </div>
+  <div class="hero-stats">
+    <div>
+      <div class="stat-num">12<span>K+</span></div>
+      <div class="stat-label">Events Monthly</div>
+    </div>
+    <div>
+      <div class="stat-num">3<span>M+</span></div>
+      <div class="stat-label">Tickets Sold</div>
+    </div>
+    <div>
+      <div class="stat-num">98<span>%</span></div>
+      <div class="stat-label">Happy Fans</div>
+    </div>
+  </div>
+</section>
+
+<!-- SEARCH -->
+<div class="search-section">
+  <div class="search-bar">
+    <div class="search-field">
+      <label>Search Events</label>
+      <input type="text" placeholder="Artist, event, or venue…"/>
+    </div>
+    <div class="search-field">
+      <label>Location</label>
+      <select>
+        <option>All Cities</option>
+        <option>Nairobi</option>
+        <option>Mombasa</option>
+        <option>Kisumu</option>
+        <option>London</option>
+        <option>New York</option>
+        <option>Lagos</option>
+      </select>
+    </div>
+    <div class="search-field">
+      <label>Date</label>
+      <input type="date"/>
+    </div>
+    <div class="search-field" style="border-right:none">
+      <label>Category</label>
+      <select>
+        <option>All Categories</option>
+        <option>Concerts</option>
+        <option>Festivals</option>
+        <option>Sports</option>
+        <option>Theatre</option>
+        <option>Comedy</option>
+      </select>
+    </div>
+    <button class="search-btn" onclick="showToast('🔍 Searching events…', '#e8c96d')">Search</button>
+  </div>
+</div>
+
+<!-- FEATURED EVENT -->
+<section style="padding-top:64px;">
+  <div class="section-label">⚡ Editor's Pick</div>
+  <div class="section-header">
+    <div class="section-title">Featured<br/>Event</div>
+    <a href="#" class="view-all">View All Featured →</a>
+  </div>
+  <div class="featured-banner">
+    <div class="featured-img" style="background:linear-gradient(135deg,#1a0533,#3d0f6e,#6a1faa);">
+      <span style="z-index:1;position:relative;filter:drop-shadow(0 0 40px rgba(180,100,255,0.5))">🎵</span>
+    </div>
+    <div class="featured-content">
+      <div class="featured-tag">🔥 Selling Fast</div>
+      <div class="featured-title">Afrobeats World<br/>Festival 2026</div>
+      <div class="featured-desc">The continent's biggest celebration of Afrobeats, Amapiano & Afro-fusion. Featuring 30+ artists across 3 stages over two nights at Uhuru Gardens.</div>
+      <div class="featured-info">
+        <div class="feat-info-item">
+          <span class="feat-info-label">Date</span>
+          <span class="feat-info-val">April 18–19, 2026</span>
+        </div>
+        <div class="feat-info-item">
+          <span class="feat-info-label">Venue</span>
+          <span class="feat-info-val">Uhuru Gardens, Nairobi</span>
+        </div>
+        <div class="feat-info-item">
+          <span class="feat-info-label">From</span>
+          <span class="feat-info-val" style="color:var(--gold)">KES 3,500</span>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="openModal('Afrobeats World Festival 2026','April 18–19, 2026','Uhuru Gardens, Nairobi')">Get Tickets</button>
+    </div>
+  </div>
+</section>
+
+<!-- EVENTS -->
+<section id="events">
+  <div class="section-label">🎟 Upcoming</div>
+  <div class="section-header">
+    <div class="section-title">Hot Events</div>
+    <a href="#" class="view-all">See All →</a>
+  </div>
+  <div class="categories" id="cats">
+    <button class="cat-pill active" onclick="filterCat(this,'all')">All</button>
+    <button class="cat-pill" onclick="filterCat(this,'concert')">🎸 Concerts</button>
+    <button class="cat-pill" onclick="filterCat(this,'festival')">🎪 Festivals</button>
+    <button class="cat-pill" onclick="filterCat(this,'sports')">⚽ Sports</button>
+    <button class="cat-pill" onclick="filterCat(this,'theatre')">🎭 Theatre</button>
+    <button class="cat-pill" onclick="filterCat(this,'comedy')">😂 Comedy</button>
+    <button class="cat-pill" onclick="filterCat(this,'art')">🎨 Art & Culture</button>
+  </div>
+  <div class="events-grid" id="eventsGrid"></div>
+</section>
+
+<!-- VENUES -->
+<section id="venues" style="background:var(--deep);">
+  <div class="section-label">📍 Top Spots</div>
+  <div class="section-header">
+    <div class="section-title">Iconic Venues</div>
+    <a href="#" class="view-all">Explore All →</a>
+  </div>
+  <div class="venues-grid">
+    <div class="venue-card">
+      <div class="venue-icon">🏟</div>
+      <div class="venue-name">Nyayo Stadium</div>
+      <div class="venue-city">Nairobi, Kenya</div>
+      <div class="venue-count">12 Upcoming Events</div>
+    </div>
+    <div class="venue-card">
+      <div class="venue-icon">🎪</div>
+      <div class="venue-name">Uhuru Gardens</div>
+      <div class="venue-city">Nairobi, Kenya</div>
+      <div class="venue-count">8 Upcoming Events</div>
+    </div>
+    <div class="venue-card">
+      <div class="venue-icon">🏛</div>
+      <div class="venue-name">Kenya National Theatre</div>
+      <div class="venue-city">Nairobi, Kenya</div>
+      <div class="venue-count">6 Upcoming Events</div>
+    </div>
+    <div class="venue-card">
+      <div class="venue-icon">🌊</div>
+      <div class="venue-name">Mombasa Arena</div>
+      <div class="venue-city">Mombasa, Kenya</div>
+      <div class="venue-count">4 Upcoming Events</div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<div class="newsletter">
+  <h2>Never Miss a Beat</h2>
+  <p>Get early access, exclusive presales, and event alerts delivered to your inbox.</p>
+  <div class="newsletter-form">
+    <input type="email" placeholder="your@email.com"/>
+    <button class="btn-primary" onclick="showToast('✅ You\'re subscribed!', 'var(--green)')">Subscribe</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="#" class="logo">Ticket<span>Vault</span></a>
+      <p>Your gateway to live experiences. Trusted by 3 million+ fans across Africa and beyond.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Discover</h4>
+      <ul>
+        <li><a href="#">Concerts</a></li>
+        <li><a href="#">Festivals</a></li>
+        <li><a href="#">Sports</a></li>
+        <li><a href="#">Theatre & Arts</a></li>
+        <li><a href="#">Comedy</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Account</h4>
+      <ul>
+        <li><a href="#">Sign In</a></li>
+        <li><a href="#">Register</a></li>
+        <li><a href="#">My Tickets</a></li>
+        <li><a href="#">Order History</a></li>
+        <li><a href="#">Saved Events</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">For Organizers</a></li>
+        <li><a href="#">Help Center</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Use</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 TicketVault. All rights reserved. Built with ♥ for live music.</p>
+    <div class="social-links">
+      <a class="social-btn" href="#" title="Twitter">𝕏</a>
+      <a class="social-btn" href="#" title="Instagram">📷</a>
+      <a class="social-btn" href="#" title="Facebook">f</a>
+      <a class="social-btn" href="#" title="TikTok">♪</a>
+    </div>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBg(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div>
+        <div class="section-label" id="modalCategory">🎵 Concert</div>
+        <h2 class="section-title" style="font-size:1.6rem" id="modalTitle">Event Name</h2>
+        <p style="color:var(--muted);font-size:0.85rem;margin-top:6px" id="modalMeta">Date · Venue</p>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-weight:600;margin-bottom:14px">Select Ticket Type</p>
+      <div class="ticket-types">
+        <div class="ticket-type selected" onclick="selectTicket(this, 1500)">
+          <div>
+            <div class="tt-name">General Admission</div>
+            <div class="tt-desc">Standing area · Doors open 6:00 PM</div>
+          </div>
+          <div class="tt-right">
+            <div class="tt-price" id="t1price">KES 1,500</div>
+            <div class="tt-avail">340 left</div>
+          </div>
+        </div>
+        <div class="ticket-type" onclick="selectTicket(this, 3500)">
+          <div>
+            <div class="tt-name">VIP Standing</div>
+            <div class="tt-desc">Front section + free drink · Priority entry</div>
+          </div>
+          <div class="tt-right">
+            <div class="tt-price">KES 3,500</div>
+            <div class="tt-avail" style="color:#e8a84d">42 left</div>
+          </div>
+        </div>
+        <div class="ticket-type" onclick="selectTicket(this, 6500)">
+          <div>
+            <div class="tt-name">Premium Table (x4)</div>
+            <div class="tt-desc">Reserved table · Bottle service · VIP lounge</div>
+          </div>
+          <div class="tt-right">
+            <div class="tt-price">KES 6,500</div>
+            <div class="tt-avail" style="color:var(--red)">8 left!</div>
+          </div>
+        </div>
+      </div>
+      <div class="qty-row">
+        <span class="qty-label">Quantity</span>
+        <div class="qty-ctrl">
+          <button class="qty-btn" onclick="changeQty(-1)">−</button>
+          <span class="qty-num" id="qtyNum">1</span>
+          <button class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+      </div>
+      <div class="order-summary">
+        <div class="order-row"><span class="label">Ticket price</span><span id="priceRow">KES 1,500</span></div>
+        <div class="order-row"><span class="label">Qty</span><span id="qtyRow">× 1</span></div>
+        <div class="order-row"><span class="label">Service fee</span><span id="feeRow">KES 150</span></div>
+        <div class="order-row"><span class="label">Total</span><span id="totalRow" style="color:var(--gold)">KES 1,650</span></div>
+      </div>
+      <button class="btn-primary" style="width:100%;text-align:center;padding:16px" onclick="checkout()">Proceed to Checkout →</button>
+      <p style="text-align:center;color:var(--muted);font-size:0.78rem;margin-top:14px">🔒 Secure checkout · Instant e-ticket delivery · No hidden fees</p>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toastIcon">✅</span>
+  <span class="toast-msg" id="toastMsg">Action completed</span>
+</div>
+
+<script>
+  const events = [
+    { id:1, title:"Sauti Sol Live in Concert", date:"Mar 28, 2026", venue:"Carnivore Grounds, Nairobi", price:"KES 2,000", cat:"concert", avail:"available", badge:"Tonight", emoji:"🎤" },
+    { id:2, title:"Safaricom Jazz Festival", date:"Apr 5, 2026", venue:"Arboretum, Nairobi", price:"KES 1,500", cat:"festival", avail:"low", badge:"Few Left", emoji:"🎷" },
+    { id:3, title:"KPL Final — AFC vs Gor", date:"Apr 12, 2026", venue:"Nyayo Stadium, Nairobi", price:"KES 500", cat:"sports", avail:"available", badge:"Sports", emoji:"⚽" },
+    { id:4, title:"Nguzo Mama — A Tribute", date:"Apr 20, 2026", venue:"Kenya National Theatre", price:"KES 800", cat:"theatre", avail:"available", badge:"Theatre", emoji:"🎭" },
+    { id:5, title:"Churchill Comedy Night", date:"May 2, 2026", venue:"KICC, Nairobi", price:"KES 1,200", cat:"comedy", avail:"available", badge:"Comedy", emoji:"😂" },
+    { id:6, title:"East Africa Art Week", date:"May 10, 2026", venue:"GoDown Arts Centre", price:"KES 600", cat:"art", avail:"available", badge:"Culture", emoji:"🎨" },
+    { id:7, title:"Mombasa Music Festival", date:"May 16, 2026", venue:"Mombasa Beach Arena", price:"KES 2,500", cat:"festival", avail:"sold", badge:"Sold Out", emoji:"🌊" },
+    { id:8, title:"Nairobi Jazz Night Vol.3", date:"May 22, 2026", venue:"Alchemist Bar, Nairobi", price:"KES 900", cat:"concert", avail:"low", badge:"Low Stock", emoji:"🎹" },
+    { id:9, title:"Kenya Rugby Sevens", date:"Jun 1, 2026", venue:"RFUEA Ground, Nairobi", price:"KES 700", cat:"sports", avail:"available", badge:"Sports", emoji:"🏉" },
+  ];
+
+  let selectedPrice = 1500;
+  let qty = 1;
+
+  function renderEvents(filter='all') {
+    const grid = document.getElementById('eventsGrid');
+    const filtered = filter === 'all' ? events : events.filter(e => e.cat === filter);
+    grid.innerHTML = filtered.map(e => `
+      <div class="event-card">
+        <div class="card-img-wrap">
+          <div style="width:100%;height:100%;background:${gradients[e.id % gradients.length]};display:flex;align-items:center;justify-content:center;font-size:4rem;">${e.emoji}</div>
+          <div class="card-badge">${e.badge}</div>
+          <div class="card-fav" onclick="event.stopPropagation();toggleFav(this)">♡</div>
+        </div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="card-date">📅 ${e.date}</span>
+            <span class="card-avail ${e.avail === 'sold' ? 'sold' : e.avail === 'low' ? 'low' : ''}">${e.avail === 'sold' ? '✕ Sold Out' : e.avail === 'low' ? '⚠ Low Stock' : '✓ Available'}</span>
+          </div>
+          <div class="card-title">${e.title}</div>
+          <div class="card-venue">📍 ${e.venue}</div>
+          <div class="card-footer">
+            <div class="card-price">From <strong>${e.price}</strong></div>
+            ${e.avail === 'sold'
+              ? `<button class="card-btn" disabled style="opacity:0.4;cursor:not-allowed">Sold Out</button>`
+              : `<button class="card-btn" onclick="openModal('${e.title}','${e.date}','${e.venue}')">Get Tickets</button>`}
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  const gradients = [
+    'linear-gradient(135deg,#1a0533,#6a1faa)',
+    'linear-gradient(135deg,#003322,#1a6644)',
+    'linear-gradient(135deg,#0a1a3a,#1a4a8a)',
+    'linear-gradient(135deg,#2a0a0a,#8a2020)',
+    'linear-gradient(135deg,#1a1a00,#6a6a00)',
+    'linear-gradient(135deg,#001a2a,#005566)',
+    'linear-gradient(135deg,#1a002a,#55006a)',
+    'linear-gradient(135deg,#0a2a1a,#1a7a4a)',
+    'linear-gradient(135deg,#2a1a00,#7a4a00)',
+  ];
+
+  function filterCat(btn, cat) {
+    document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    renderEvents(cat);
+  }
+
+  function openModal(title, date, venue) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalMeta').textContent = `${date} · ${venue}`;
+    qty = 1;
+    selectedPrice = 1500;
+    updateSummary();
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closeModalOnBg(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+  }
+
+  function selectTicket(el, price) {
+    document.querySelectorAll('.ticket-type').forEach(t => t.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedPrice = price;
+    updateSummary();
+  }
+
+  function changeQty(d) {
+    qty = Math.max(1, Math.min(10, qty + d));
+    document.getElementById('qtyNum').textContent = qty;
+    updateSummary();
+  }
+
+  function updateSummary() {
+    const fee = Math.round(selectedPrice * 0.1);
+    document.getElementById('priceRow').textContent = `KES ${selectedPrice.toLocaleString()}`;
+    document.getElementById('qtyRow').textContent = `× ${qty}`;
+    document.getElementById('feeRow').textContent = `KES ${(fee * qty).toLocaleString()}`;
+    document.getElementById('totalRow').textContent = `KES ${((selectedPrice + fee) * qty).toLocaleString()}`;
+  }
+
+  function checkout() {
+    closeModal();
+    showToast('🎉 Tickets reserved! Redirecting to payment…', 'var(--green)');
+  }
+
+  function toggleFav(btn) {
+    btn.textContent = btn.textContent === '♡' ? '♥' : '♡';
+    btn.style.color = btn.textContent === '♥' ? 'var(--red)' : '';
+    if (btn.textContent === '♥') showToast('❤️ Added to your wishlist', 'var(--red)');
+  }
+
+  function showToast(msg, color='var(--green)') {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.style.borderLeftColor = color;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // Init
+  renderEvents();
+</script>
+</body>
+</html>
