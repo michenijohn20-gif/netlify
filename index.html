@@ -1307,6 +1307,7 @@
   }
 
   // ── GET TICKETS (requires login) ──────────────────────────────────
+  // ── GET TICKETS (requires login) ──────────────────────────────────
   let currentEventId    = null;
   let currentEventTitle = null;
 
@@ -1370,30 +1371,28 @@
       return;
     }
 
-    const fee        = Math.round(selectedPrice * 0.1);
-    const total      = (selectedPrice + fee) * qty;
-    const txRef      = 'TV-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+    const fee   = Math.round(selectedPrice * 0.1);
+    const total = (selectedPrice + fee) * qty;
+    const txRef = 'TV-' + Date.now() + '-' + Math.random().toString(36).substr(2,6).toUpperCase();
 
-    // Close ticket modal before opening Paystack popup
+    // Close the ticket modal first
     closeModal();
 
     const handler = PaystackPop.setup({
-      key:       'pk_test_0c48c322ad3293e3d966e1329b0f6b35710dfea6',
-      email:     currentUser.email,
-      amount:    total * 100,   // Paystack uses kobo/cents — multiply by 100
-      currency:  'KES',
-      ref:       txRef,
-      label:     currentEventTitle || 'Event Ticket',
+      key:      'pk_test_0c48c322ad3293e3d966e1329b0f6b35710dfea6',
+      email:    currentUser.email,
+      amount:   total * 100,
+      currency: 'KES',
+      ref:      txRef,
+      label:    currentEventTitle || 'Event Ticket',
       metadata: {
         custom_fields: [
           { display_name: 'Event',    variable_name: 'event',    value: currentEventTitle || '' },
-          { display_name: 'Quantity', variable_name: 'quantity', value: qty },
+          { display_name: 'Quantity', variable_name: 'quantity', value: String(qty) },
         ]
       },
       callback: async function(response) {
-        // Payment successful — save booking to Supabase
         showToast('Processing your booking…', 'var(--gold)');
-
         const { error } = await supabaseClient.from('bookings').insert({
           user_id:      currentUser.id,
           event_id:     currentEventId || null,
@@ -1402,19 +1401,14 @@
           status:       'confirmed',
           qr_code:      'QR-' + response.reference,
         });
-
         if (error) {
           console.error('Booking save error:', error.message);
           showToast('Payment received but booking failed to save. Contact support.', 'var(--red)');
         } else {
           showToast('🎉 Tickets confirmed! Check My Tickets.', 'var(--green)');
         }
-
-        // Reset state
-        currentEventId    = null;
-        currentEventTitle = null;
-        qty               = 1;
-        selectedPrice     = 1500;
+        currentEventId = null; currentEventTitle = null;
+        qty = 1; selectedPrice = 1500;
       },
       onClose: function() {
         showToast('Payment cancelled — your tickets were not booked.', 'var(--muted)');
