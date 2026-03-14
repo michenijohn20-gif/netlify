@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>TicketVault — Live Events</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -802,6 +803,31 @@
 </div>
 
 <script>
+  // 1. Connect to Supabase
+const supabase = window.supabase.createClient(
+  'https://abcdefghijk.supabase.co',   // paste your Project URL here
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6...'   // paste your anon key here
+)
+
+// 2. Load events from the database
+async function loadEvents() {
+  const { data, error } = await supabase
+    .from('events')
+    .select('*')
+    .eq('is_published', true)
+    .order('date', { ascending: true })
+
+  if (error) {
+    console.error('Error loading events:', error)
+    return
+  }
+
+  // 3. Render them on the page
+  renderEvents(data)
+}
+
+// 4. Call it when the page loads
+loadEvents()
   const events = [
     { id:1, title:"Sauti Sol Live in Concert", date:"Mar 28, 2026", venue:"Carnivore Grounds, Nairobi", price:"KES 2,000", cat:"concert", avail:"available", badge:"Tonight", emoji:"🎤" },
     { id:2, title:"Safaricom Jazz Festival", date:"Apr 5, 2026", venue:"Arboretum, Nairobi", price:"KES 1,500", cat:"festival", avail:"low", badge:"Few Left", emoji:"🎷" },
@@ -817,34 +843,36 @@
   let selectedPrice = 1500;
   let qty = 1;
 
-  function renderEvents(filter='all') {
-    const grid = document.getElementById('eventsGrid');
-    const filtered = filter === 'all' ? events : events.filter(e => e.cat === filter);
-    grid.innerHTML = filtered.map(e => `
-      <div class="event-card">
-        <div class="card-img-wrap">
-          <div style="width:100%;height:100%;background:${gradients[e.id % gradients.length]};display:flex;align-items:center;justify-content:center;font-size:4rem;">${e.emoji}</div>
-          <div class="card-badge">${e.badge}</div>
-          <div class="card-fav" onclick="event.stopPropagation();toggleFav(this)">♡</div>
+  function renderEvents(eventsData, filter = 'all') {
+  const grid = document.getElementById('eventsGrid')
+  const filtered = filter === 'all'
+    ? eventsData
+    : eventsData.filter(e => e.category === filter)
+
+  grid.innerHTML = filtered.map(e => `
+    <div class="event-card">
+      <div class="card-img-wrap">
+        <img src="${e.image_url}" alt="${e.title}" 
+             onerror="this.style.display='none'"/>
+        <div class="card-badge">${e.category}</div>
+      </div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="card-date">📅 ${new Date(e.date).toDateString()}</span>
         </div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span class="card-date">📅 ${e.date}</span>
-            <span class="card-avail ${e.avail === 'sold' ? 'sold' : e.avail === 'low' ? 'low' : ''}">${e.avail === 'sold' ? '✕ Sold Out' : e.avail === 'low' ? '⚠ Low Stock' : '✓ Available'}</span>
-          </div>
-          <div class="card-title">${e.title}</div>
-          <div class="card-venue">📍 ${e.venue}</div>
-          <div class="card-footer">
-            <div class="card-price">From <strong>${e.price}</strong></div>
-            ${e.avail === 'sold'
-              ? `<button class="card-btn" disabled style="opacity:0.4;cursor:not-allowed">Sold Out</button>`
-              : `<button class="card-btn" onclick="openModal('${e.title}','${e.date}','${e.venue}')">Get Tickets</button>`}
-          </div>
+        <div class="card-title">${e.title}</div>
+        <div class="card-venue">📍 ${e.venue}, ${e.city}</div>
+        <div class="card-footer">
+          <div class="card-price">From <strong>${e.city === 'Nairobi' ? 'KES' : '$'} —</strong></div>
+          <button class="card-btn" 
+            onclick="openModal('${e.title}', '${e.date}', '${e.venue}')">
+            Get Tickets
+          </button>
         </div>
       </div>
-    `).join('');
-  }
-
+    </div>
+  `).join('')
+}
   const gradients = [
     'linear-gradient(135deg,#1a0533,#6a1faa)',
     'linear-gradient(135deg,#003322,#1a6644)',
