@@ -1371,59 +1371,53 @@
       return;
     }
 
-    const fee   = Math.round(selectedPrice * 0.1);
-    const total = (selectedPrice + fee) * qty;
-    const txRef = 'TV-' + Date.now() + '-' + Math.random().toString(36).substr(2,6).toUpperCase();
-
-    // Snapshot values before closing modal (closeModal resets nothing but good practice)
-    const snapQty      = qty;
-    const snapTotal    = total;
-    const snapEventId  = currentEventId;
-    const snapTitle    = currentEventTitle;
+    var fee      = Math.round(selectedPrice * 0.1);
+    var total    = (selectedPrice + fee) * qty;
+    var txRef    = 'TV-' + Date.now() + '-' + Math.random().toString(36).substr(2,6).toUpperCase();
+    var snapQty  = qty;
+    var snapId   = currentEventId;
+    var snapName = currentEventTitle;
 
     closeModal();
 
-    // Small delay so modal fully closes before Paystack popup opens
-    setTimeout(function() {
-      const handler = PaystackPop.setup({
-        key:      'pk_test_0c48c322ad3293e3d966e1329b0f6b35710dfea6',
-        email:    currentUser.email,
-        amount:   snapTotal * 100,
-        currency: 'KES',
-        ref:      txRef,
-        label:    snapTitle || 'Event Ticket',
-        metadata: {
-          custom_fields: [
-            { display_name: 'Event',    variable_name: 'event',    value: snapTitle || '' },
-            { display_name: 'Quantity', variable_name: 'quantity', value: String(snapQty) },
-          ]
-        },
-        callback: async function(response) {
-          showToast('Processing your booking…', 'var(--gold)');
-          const { error } = await supabaseClient.from('bookings').insert({
-            user_id:      currentUser.id,
-            event_id:     snapEventId || null,
-            quantity:     snapQty,
-            total_amount: snapTotal,
-            status:       'confirmed',
-            qr_code:      'QR-' + response.reference,
-          });
-          if (error) {
-            console.error('Booking save error:', error.message);
-            showToast('Payment received but booking failed to save. Contact support.', 'var(--red)');
-          } else {
-            showToast('🎉 Tickets confirmed! Check My Tickets.', 'var(--green)');
-          }
-          currentEventId = null; currentEventTitle = null;
-          qty = 1; selectedPrice = 1500;
-        },
-        onClose: function() {
-          showToast('Payment cancelled — your tickets were not booked.', 'var(--muted)');
+    function paystackCallback(response) {
+      showToast('Processing your booking…', 'var(--gold)');
+      supabaseClient.from('bookings').insert({
+        user_id:      currentUser.id,
+        event_id:     snapId || null,
+        quantity:     snapQty,
+        total_amount: total,
+        status:       'confirmed',
+        qr_code:      'QR-' + response.reference,
+      }).then(function(result) {
+        if (result.error) {
+          console.error('Booking error:', result.error.message);
+          showToast('Payment received but booking failed to save. Contact support.', 'var(--red)');
+        } else {
+          showToast('🎉 Tickets confirmed! Check My Tickets.', 'var(--green)');
         }
       });
+      currentEventId = null; currentEventTitle = null;
+      qty = 1; selectedPrice = 1500;
+    }
 
+    function paystackOnClose() {
+      showToast('Payment cancelled — your tickets were not booked.', 'var(--muted)');
+    }
+
+    setTimeout(function() {
+      var handler = PaystackPop.setup({
+        key:      'pk_test_0c48c322ad3293e3d966e1329b0f6b35710dfea6',
+        email:    currentUser.email,
+        amount:   total * 100,
+        currency: 'KES',
+        ref:      txRef,
+        label:    snapName || 'Event Ticket',
+        callback: paystackCallback,
+        onClose:  paystackOnClose
+      });
       handler.openIframe();
-    }, 300);
+    }, 400);
   }
 
   // ── FAVOURITES (with Supabase) ────────────────────────────────────
