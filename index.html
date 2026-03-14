@@ -1375,47 +1375,55 @@
     const total = (selectedPrice + fee) * qty;
     const txRef = 'TV-' + Date.now() + '-' + Math.random().toString(36).substr(2,6).toUpperCase();
 
-    // Close the ticket modal first
+    // Snapshot values before closing modal (closeModal resets nothing but good practice)
+    const snapQty      = qty;
+    const snapTotal    = total;
+    const snapEventId  = currentEventId;
+    const snapTitle    = currentEventTitle;
+
     closeModal();
 
-    const handler = PaystackPop.setup({
-      key:      'pk_test_0c48c322ad3293e3d966e1329b0f6b35710dfea6',
-      email:    currentUser.email,
-      amount:   total * 100,
-      currency: 'KES',
-      ref:      txRef,
-      label:    currentEventTitle || 'Event Ticket',
-      metadata: {
-        custom_fields: [
-          { display_name: 'Event',    variable_name: 'event',    value: currentEventTitle || '' },
-          { display_name: 'Quantity', variable_name: 'quantity', value: String(qty) },
-        ]
-      },
-      callback: async function(response) {
-        showToast('Processing your booking…', 'var(--gold)');
-        const { error } = await supabaseClient.from('bookings').insert({
-          user_id:      currentUser.id,
-          event_id:     currentEventId || null,
-          quantity:     qty,
-          total_amount: total,
-          status:       'confirmed',
-          qr_code:      'QR-' + response.reference,
-        });
-        if (error) {
-          console.error('Booking save error:', error.message);
-          showToast('Payment received but booking failed to save. Contact support.', 'var(--red)');
-        } else {
-          showToast('🎉 Tickets confirmed! Check My Tickets.', 'var(--green)');
+    // Small delay so modal fully closes before Paystack popup opens
+    setTimeout(function() {
+      const handler = PaystackPop.setup({
+        key:      'pk_test_0c48c322ad3293e3d966e1329b0f6b35710dfea6',
+        email:    currentUser.email,
+        amount:   snapTotal * 100,
+        currency: 'KES',
+        ref:      txRef,
+        label:    snapTitle || 'Event Ticket',
+        metadata: {
+          custom_fields: [
+            { display_name: 'Event',    variable_name: 'event',    value: snapTitle || '' },
+            { display_name: 'Quantity', variable_name: 'quantity', value: String(snapQty) },
+          ]
+        },
+        callback: async function(response) {
+          showToast('Processing your booking…', 'var(--gold)');
+          const { error } = await supabaseClient.from('bookings').insert({
+            user_id:      currentUser.id,
+            event_id:     snapEventId || null,
+            quantity:     snapQty,
+            total_amount: snapTotal,
+            status:       'confirmed',
+            qr_code:      'QR-' + response.reference,
+          });
+          if (error) {
+            console.error('Booking save error:', error.message);
+            showToast('Payment received but booking failed to save. Contact support.', 'var(--red)');
+          } else {
+            showToast('🎉 Tickets confirmed! Check My Tickets.', 'var(--green)');
+          }
+          currentEventId = null; currentEventTitle = null;
+          qty = 1; selectedPrice = 1500;
+        },
+        onClose: function() {
+          showToast('Payment cancelled — your tickets were not booked.', 'var(--muted)');
         }
-        currentEventId = null; currentEventTitle = null;
-        qty = 1; selectedPrice = 1500;
-      },
-      onClose: function() {
-        showToast('Payment cancelled — your tickets were not booked.', 'var(--muted)');
-      }
-    });
+      });
 
-    handler.openIframe();
+      handler.openIframe();
+    }, 300);
   }
 
   // ── FAVOURITES (with Supabase) ────────────────────────────────────
