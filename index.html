@@ -6,6 +6,7 @@
   <title>TicketVault — Live Events</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://js.paystack.co/v1/inline.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -731,7 +732,7 @@
           <span class="feat-info-val" style="color:var(--gold)">KES 3,500</span>
         </div>
       </div>
-      <button class="btn-primary" onclick="openModal('Afrobeats World Festival 2026','April 18–19, 2026','Uhuru Gardens, Nairobi')">Get Tickets</button>
+      <button class="btn-primary" onclick="handleGetTickets('','Afrobeats World Festival 2026','April 18–19, 2026','Uhuru Gardens, Nairobi')">Get Tickets</button>
     </div>
   </div>
 </section>
@@ -1289,7 +1290,7 @@
             <div class="card-footer">
               <div class="card-price">From <strong>KES —</strong></div>
               <button class="card-btn"
-                onclick="handleGetTickets('${e.title.replace(/'/g,"\\'")}','${dateStr}','${e.venue.replace(/'/g,"\\'")}')">
+                onclick="handleGetTickets('${e.id}','${e.title.replace(/'/g,"\\'")}','${dateStr}','${e.venue.replace(/'/g,"\\'")}')">
                 Get Tickets
               </button>
             </div>
@@ -1306,13 +1307,17 @@
   }
 
   // ── GET TICKETS (requires login) ──────────────────────────────────
-  function handleGetTickets(title, date, venue) {
+  let currentEventId    = null;
+  let currentEventTitle = null;
+
+  function handleGetTickets(eventId, title, date, venue) {
     if (!currentUser) {
-      // Not logged in — open auth modal first
       openAuthModal(null);
       showAuthError('Please sign in to purchase tickets.');
       return;
     }
+    currentEventId    = eventId;
+    currentEventTitle = title;
     openModal(title, date, venue);
   }
 
@@ -1356,9 +1361,67 @@
     document.getElementById('totalRow').textContent = `KES ${((selectedPrice + fee) * qty).toLocaleString()}`;
   }
 
+  // ── CHECKOUT WITH PAYSTACK ────────────────────────────────────────
   function checkout() {
+    if (!currentUser) {
+      closeModal();
+      openAuthModal(null);
+      showAuthError('Please sign in to purchase tickets.');
+      return;
+    }
+
+    const fee        = Math.round(selectedPrice * 0.1);
+    const total      = (selectedPrice + fee) * qty;
+    const txRef      = 'TV-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+
+    // Close ticket modal before opening Paystack popup
     closeModal();
-    showToast('🎉 Tickets reserved! Redirecting to payment…', 'var(--green)');
+
+    const handler = PaystackPop.setup({
+      key:       'pk_test_0c48c322ad3293e3d966e1329b0f6b35710dfea6',
+      email:     currentUser.email,
+      amount:    total * 100,   // Paystack uses kobo/cents — multiply by 100
+      currency:  'KES',
+      ref:       txRef,
+      label:     currentEventTitle || 'Event Ticket',
+      metadata: {
+        custom_fields: [
+          { display_name: 'Event',    variable_name: 'event',    value: currentEventTitle || '' },
+          { display_name: 'Quantity', variable_name: 'quantity', value: qty },
+        ]
+      },
+      callback: async function(response) {
+        // Payment successful — save booking to Supabase
+        showToast('Processing your booking…', 'var(--gold)');
+
+        const { error } = await supabaseClient.from('bookings').insert({
+          user_id:      currentUser.id,
+          event_id:     currentEventId || null,
+          quantity:     qty,
+          total_amount: total,
+          status:       'confirmed',
+          qr_code:      'QR-' + response.reference,
+        });
+
+        if (error) {
+          console.error('Booking save error:', error.message);
+          showToast('Payment received but booking failed to save. Contact support.', 'var(--red)');
+        } else {
+          showToast('🎉 Tickets confirmed! Check My Tickets.', 'var(--green)');
+        }
+
+        // Reset state
+        currentEventId    = null;
+        currentEventTitle = null;
+        qty               = 1;
+        selectedPrice     = 1500;
+      },
+      onClose: function() {
+        showToast('Payment cancelled — your tickets were not booked.', 'var(--muted)');
+      }
+    });
+
+    handler.openIframe();
   }
 
   // ── FAVOURITES (with Supabase) ────────────────────────────────────
