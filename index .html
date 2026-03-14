@@ -803,76 +803,20 @@
 </div>
 
 <script>
-  // 1. Connect to Supabase
-const supabase = window.supabase.createClient(
-  'https://abcdefghijk.supabase.co',   // paste your Project URL here
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6...'   // paste your anon key here
-)
+  // ── SUPABASE SETUP ──────────────────────────────────────────────
+  // IMPORTANT: Replace these two values with your own from Supabase
+  // Settings → Data API → Project URL and anon/public key
+  const supabaseClient = window.supabase.createClient(
+    'https://geukqojtcqpnjfxwnieq.supabase.co',  // ← paste your Project URL
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdldWtxb2p0Y3FwbmpmeHduaWVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDY4MjAsImV4cCI6MjA4OTA4MjgyMH0.LobxmGs6OjtDubYQYOBy6v9fle69ZnSzc9DW1MyC5YU'                           // ← paste your anon key
+  );
 
-// 2. Load events from the database
-async function loadEvents() {
-  const { data, error } = await supabase
-    .from('events')
-    .select('*')
-    .eq('is_published', true)
-    .order('date', { ascending: true })
-
-  if (error) {
-    console.error('Error loading events:', error)
-    return
-  }
-
-  // 3. Render them on the page
-  renderEvents(data)
-}
-
-// 4. Call it when the page loads
-loadEvents()
-  const events = [
-    { id:1, title:"Sauti Sol Live in Concert", date:"Mar 28, 2026", venue:"Carnivore Grounds, Nairobi", price:"KES 2,000", cat:"concert", avail:"available", badge:"Tonight", emoji:"🎤" },
-    { id:2, title:"Safaricom Jazz Festival", date:"Apr 5, 2026", venue:"Arboretum, Nairobi", price:"KES 1,500", cat:"festival", avail:"low", badge:"Few Left", emoji:"🎷" },
-    { id:3, title:"KPL Final — AFC vs Gor", date:"Apr 12, 2026", venue:"Nyayo Stadium, Nairobi", price:"KES 500", cat:"sports", avail:"available", badge:"Sports", emoji:"⚽" },
-    { id:4, title:"Nguzo Mama — A Tribute", date:"Apr 20, 2026", venue:"Kenya National Theatre", price:"KES 800", cat:"theatre", avail:"available", badge:"Theatre", emoji:"🎭" },
-    { id:5, title:"Churchill Comedy Night", date:"May 2, 2026", venue:"KICC, Nairobi", price:"KES 1,200", cat:"comedy", avail:"available", badge:"Comedy", emoji:"😂" },
-    { id:6, title:"East Africa Art Week", date:"May 10, 2026", venue:"GoDown Arts Centre", price:"KES 600", cat:"art", avail:"available", badge:"Culture", emoji:"🎨" },
-    { id:7, title:"Mombasa Music Festival", date:"May 16, 2026", venue:"Mombasa Beach Arena", price:"KES 2,500", cat:"festival", avail:"sold", badge:"Sold Out", emoji:"🌊" },
-    { id:8, title:"Nairobi Jazz Night Vol.3", date:"May 22, 2026", venue:"Alchemist Bar, Nairobi", price:"KES 900", cat:"concert", avail:"low", badge:"Low Stock", emoji:"🎹" },
-    { id:9, title:"Kenya Rugby Sevens", date:"Jun 1, 2026", venue:"RFUEA Ground, Nairobi", price:"KES 700", cat:"sports", avail:"available", badge:"Sports", emoji:"🏉" },
-  ];
-
+  // ── STATE ───────────────────────────────────────────────────────
+  let allEvents = [];       // stores all events loaded from database
   let selectedPrice = 1500;
   let qty = 1;
 
-  function renderEvents(eventsData, filter = 'all') {
-  const grid = document.getElementById('eventsGrid')
-  const filtered = filter === 'all'
-    ? eventsData
-    : eventsData.filter(e => e.category === filter)
-
-  grid.innerHTML = filtered.map(e => `
-    <div class="event-card">
-      <div class="card-img-wrap">
-        <img src="${e.image_url}" alt="${e.title}" 
-             onerror="this.style.display='none'"/>
-        <div class="card-badge">${e.category}</div>
-      </div>
-      <div class="card-body">
-        <div class="card-meta">
-          <span class="card-date">📅 ${new Date(e.date).toDateString()}</span>
-        </div>
-        <div class="card-title">${e.title}</div>
-        <div class="card-venue">📍 ${e.venue}, ${e.city}</div>
-        <div class="card-footer">
-          <div class="card-price">From <strong>${e.city === 'Nairobi' ? 'KES' : '$'} —</strong></div>
-          <button class="card-btn" 
-            onclick="openModal('${e.title}', '${e.date}', '${e.venue}')">
-            Get Tickets
-          </button>
-        </div>
-      </div>
-    </div>
-  `).join('')
-}
+  // ── GRADIENTS (fallback when no image) ──────────────────────────
   const gradients = [
     'linear-gradient(135deg,#1a0533,#6a1faa)',
     'linear-gradient(135deg,#003322,#1a6644)',
@@ -885,12 +829,91 @@ loadEvents()
     'linear-gradient(135deg,#2a1a00,#7a4a00)',
   ];
 
+  // ── LOAD EVENTS FROM SUPABASE ────────────────────────────────────
+  async function loadEvents() {
+    // Show a loading state
+    document.getElementById('eventsGrid').innerHTML =
+      '<p style="color:var(--muted);grid-column:1/-1;text-align:center;padding:40px">Loading events…</p>';
+
+    const { data, error } = await supabaseClient
+      .from('events')
+      .select('*')
+      .eq('is_published', true)
+      .order('date', { ascending: true });
+
+    if (error) {
+      console.error('❌ Failed to load events:', error.message);
+      document.getElementById('eventsGrid').innerHTML =
+        '<p style="color:var(--red);grid-column:1/-1;text-align:center;padding:40px">Could not load events. Please check your Supabase keys.</p>';
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      document.getElementById('eventsGrid').innerHTML =
+        '<p style="color:var(--muted);grid-column:1/-1;text-align:center;padding:40px">No events found. Add some events in your Supabase table editor.</p>';
+      return;
+    }
+
+    console.log('✅ Events loaded:', data.length, 'events');
+    allEvents = data;
+    renderEvents('all');
+  }
+
+  // ── RENDER EVENTS ────────────────────────────────────────────────
+  function renderEvents(filter) {
+    const grid = document.getElementById('eventsGrid');
+
+    const filtered = filter === 'all'
+      ? allEvents
+      : allEvents.filter(e => e.category === filter);
+
+    if (filtered.length === 0) {
+      grid.innerHTML = '<p style="color:var(--muted);grid-column:1/-1;text-align:center;padding:40px">No events in this category yet.</p>';
+      return;
+    }
+
+    grid.innerHTML = filtered.map((e, i) => {
+      // Work out availability label from ticket counts if available
+      const imgBg = gradients[i % gradients.length];
+      const dateStr = e.date ? new Date(e.date).toLocaleDateString('en-KE', { day:'numeric', month:'short', year:'numeric' }) : '';
+
+      return `
+        <div class="event-card">
+          <div class="card-img-wrap">
+            ${e.image_url
+              ? `<img src="${e.image_url}" alt="${e.title}" onerror="this.parentElement.style.background='${imgBg}';this.remove()"/>`
+              : `<div style="width:100%;height:100%;background:${imgBg};display:flex;align-items:center;justify-content:center;font-size:4rem;">🎟</div>`
+            }
+            <div class="card-badge">${e.category || 'event'}</div>
+            <div class="card-fav" onclick="event.stopPropagation();toggleFav(this)">♡</div>
+          </div>
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="card-date">📅 ${dateStr}</span>
+              <span class="card-avail">✓ Available</span>
+            </div>
+            <div class="card-title">${e.title}</div>
+            <div class="card-venue">📍 ${e.venue}${e.city ? ', ' + e.city : ''}</div>
+            <div class="card-footer">
+              <div class="card-price">From <strong>KES —</strong></div>
+              <button class="card-btn"
+                onclick="openModal('${e.title.replace(/'/g,"\\'")}','${dateStr}','${e.venue.replace(/'/g,"\\'")}')">
+                Get Tickets
+              </button>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── FILTER BY CATEGORY ───────────────────────────────────────────
   function filterCat(btn, cat) {
     document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
     btn.classList.add('active');
     renderEvents(cat);
   }
 
+  // ── MODAL ────────────────────────────────────────────────────────
   function openModal(title, date, venue) {
     document.getElementById('modalTitle').textContent = title;
     document.getElementById('modalMeta').textContent = `${date} · ${venue}`;
@@ -931,17 +954,20 @@ loadEvents()
     document.getElementById('totalRow').textContent = `KES ${((selectedPrice + fee) * qty).toLocaleString()}`;
   }
 
+  // ── CHECKOUT ─────────────────────────────────────────────────────
   function checkout() {
     closeModal();
     showToast('🎉 Tickets reserved! Redirecting to payment…', 'var(--green)');
   }
 
+  // ── FAVOURITES ───────────────────────────────────────────────────
   function toggleFav(btn) {
     btn.textContent = btn.textContent === '♡' ? '♥' : '♡';
     btn.style.color = btn.textContent === '♥' ? 'var(--red)' : '';
     if (btn.textContent === '♥') showToast('❤️ Added to your wishlist', 'var(--red)');
   }
 
+  // ── TOAST NOTIFICATION ───────────────────────────────────────────
   function showToast(msg, color='var(--green)') {
     const t = document.getElementById('toast');
     document.getElementById('toastMsg').textContent = msg;
@@ -950,8 +976,8 @@ loadEvents()
     setTimeout(() => t.classList.remove('show'), 3000);
   }
 
-  // Init
-  renderEvents();
+  // ── INIT: load events when page is ready ─────────────────────────
+  loadEvents();
 </script>
 </body>
 </html>
