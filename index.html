@@ -1356,7 +1356,7 @@ img, video, canvas {
     <p class="auth-tagline">Your gateway to live experiences</p>
 
     <!-- Tabs -->
-    <div class="auth-tabs">
+    <div class="auth-tabs" id="authMainTabs">
       <button class="auth-tab active" id="tabSignIn" onclick="switchTab('signin')">Sign In</button>
       <button class="auth-tab" id="tabSignUp" onclick="switchTab('signup')">Create Account</button>
     </div>
@@ -1367,38 +1367,19 @@ img, video, canvas {
 
     <!-- SIGN IN FORM -->
     <div id="formSignIn">
-      <!-- Toggle email/phone -->
-      <div style="display:flex;gap:8px;margin-bottom:18px">
-        <button id="siModeEmail" class="auth-tab active" style="flex:1;font-size:0.78rem;padding:7px" onclick="setSiMode('email')">📧 Email</button>
-        <button id="siModePhone" class="auth-tab" style="flex:1;font-size:0.78rem;padding:7px" onclick="setSiMode('phone')">📱 Phone</button>
+      <div class="auth-field">
+        <label>Email</label>
+        <input type="email" id="siEmail" placeholder="you@example.com"/>
       </div>
-      <!-- Email login -->
-      <div id="siEmailFields">
-        <div class="auth-field">
-          <label>Email</label>
-          <input type="email" id="siEmail" placeholder="you@example.com"/>
-        </div>
-        <div class="auth-field">
-          <label>Password</label>
-          <input type="password" id="siPassword" placeholder="Your password"
-                 onkeydown="if(event.key==='Enter') handleSignIn()"/>
-        </div>
-        <button class="auth-submit" id="btnSignIn" onclick="handleSignIn()">Sign In</button>
+      <div class="auth-field">
+        <label>Password</label>
+        <input type="password" id="siPassword" placeholder="Your password"
+               onkeydown="if(event.key==='Enter') handleSignIn()"/>
       </div>
-      <!-- Phone OTP login -->
-      <div id="siPhoneFields" style="display:none">
-        <div class="auth-field">
-          <label>Phone Number</label>
-          <input type="tel" id="siPhone" placeholder="+254 7XX XXX XXX"/>
-        </div>
-        <div class="auth-field" id="siOtpField" style="display:none">
-          <label>OTP Code (sent via SMS)</label>
-          <input type="text" id="siOtp" placeholder="Enter 6-digit code" maxlength="6"
-                 onkeydown="if(event.key==='Enter') handlePhoneVerify()"/>
-        </div>
-        <button class="auth-submit" id="btnSendOtp" onclick="handleSendOtp()">Send OTP</button>
-        <button class="auth-submit" id="btnVerifyOtp" style="display:none" onclick="handlePhoneVerify()">Verify & Sign In</button>
+      <div style="text-align:right;margin:-8px 0 16px">
+        <a href="#" style="color:var(--gold);text-decoration:none;font-size:0.8rem" onclick="switchTab('forgot')">Forgot password?</a>
       </div>
+      <button class="auth-submit" id="btnSignIn" onclick="handleSignIn()">Sign In</button>
       <p style="text-align:center;color:var(--muted);font-size:0.8rem;margin-top:16px">
         No account? <a href="#" style="color:var(--gold);text-decoration:none" onclick="switchTab('signup')">Create one free →</a>
       </p>
@@ -1406,49 +1387,57 @@ img, video, canvas {
 
     <!-- SIGN UP FORM -->
     <div id="formSignUp" style="display:none">
-      <!-- Toggle email/phone -->
-      <div style="display:flex;gap:8px;margin-bottom:18px">
-        <button id="suModeEmail" class="auth-tab active" style="flex:1;font-size:0.78rem;padding:7px" onclick="setSuMode('email')">📧 Email</button>
-        <button id="suModePhone" class="auth-tab" style="flex:1;font-size:0.78rem;padding:7px" onclick="setSuMode('phone')">📱 Phone</button>
+      <div class="auth-field">
+        <label>Full Name</label>
+        <input type="text" id="suName" placeholder="Your full name"/>
       </div>
-      <!-- Email signup -->
-      <div id="suEmailFields">
-        <div class="auth-field">
-          <label>Full Name</label>
-          <input type="text" id="suName" placeholder="Your full name"/>
-        </div>
-        <div class="auth-field">
-          <label>Email</label>
-          <input type="email" id="suEmail" placeholder="you@example.com"/>
-        </div>
-        <div class="auth-field">
-          <label>Password</label>
-          <input type="password" id="suPassword" placeholder="Min 6 characters"
-                 onkeydown="if(event.key==='Enter') handleSignUp()"/>
-        </div>
-        <button class="auth-submit" id="btnSignUp" onclick="handleSignUp()">Create Account</button>
+      <div class="auth-field">
+        <label>Email</label>
+        <input type="email" id="suEmail" placeholder="you@example.com"/>
       </div>
-      <!-- Phone signup -->
-      <div id="suPhoneFields" style="display:none">
-        <div class="auth-field">
-          <label>Full Name</label>
-          <input type="text" id="suPhoneName" placeholder="Your full name"/>
-        </div>
-        <div class="auth-field">
-          <label>Phone Number</label>
-          <input type="tel" id="suPhone" placeholder="+254 7XX XXX XXX"/>
-        </div>
-        <div class="auth-field" id="suOtpField" style="display:none">
-          <label>OTP Code (sent via SMS)</label>
-          <input type="text" id="suOtp" placeholder="Enter 6-digit code" maxlength="6"
-                 onkeydown="if(event.key==='Enter') handlePhoneSignUpVerify()"/>
-        </div>
-        <button class="auth-submit" id="btnSuSendOtp" onclick="handlePhoneSignUp()">Send OTP</button>
-        <button class="auth-submit" id="btnSuVerifyOtp" style="display:none" onclick="handlePhoneSignUpVerify()">Verify & Create Account</button>
+      <div class="auth-field">
+        <label>Password</label>
+        <input type="password" id="suPassword" placeholder="Min 6 characters"
+               onkeydown="if(event.key==='Enter') handleSignUp()"/>
       </div>
+      <button class="auth-submit" id="btnSignUp" onclick="handleSignUp()">Create Account</button>
       <p style="text-align:center;color:var(--muted);font-size:0.8rem;margin-top:16px">
         Already have an account? <a href="#" style="color:var(--gold);text-decoration:none" onclick="switchTab('signin')">Sign in →</a>
       </p>
+    </div>
+
+    <!-- FORGOT PASSWORD FORM -->
+    <div id="formForgot" style="display:none">
+      <p style="color:var(--muted);font-size:0.875rem;margin-bottom:20px;line-height:1.6">
+        Enter your email and we'll send you a link to reset your password.
+      </p>
+      <div class="auth-field">
+        <label>Email</label>
+        <input type="email" id="fpEmail" placeholder="you@example.com"
+               onkeydown="if(event.key==='Enter') handleForgotPassword()"/>
+      </div>
+      <button class="auth-submit" id="btnForgot" onclick="handleForgotPassword()">Send Reset Link</button>
+      <p style="text-align:center;color:var(--muted);font-size:0.8rem;margin-top:16px">
+        Remembered it? <a href="#" style="color:var(--gold);text-decoration:none" onclick="switchTab('signin')">Back to Sign In →</a>
+      </p>
+    </div>
+
+    <!-- RESET PASSWORD FORM (after clicking email link) -->
+    <div id="formReset" style="display:none">
+      <p style="color:var(--muted);font-size:0.875rem;margin-bottom:20px;line-height:1.6">
+        Choose a new password for your account.
+      </p>
+      <div class="auth-field">
+        <label>New Password</label>
+        <input type="password" id="rpPassword" placeholder="Min 6 characters"
+               onkeydown="if(event.key==='Enter') handleResetPassword()"/>
+      </div>
+      <div class="auth-field">
+        <label>Confirm Password</label>
+        <input type="password" id="rpConfirm" placeholder="Repeat new password"
+               onkeydown="if(event.key==='Enter') handleResetPassword()"/>
+      </div>
+      <button class="auth-submit" id="btnReset" onclick="handleResetPassword()">Set New Password</button>
     </div>
   </div>
 </div>
@@ -1563,21 +1552,82 @@ img, video, canvas {
 
   function switchTab(tab) {
     clearAuthMessages();
+    const isForgot = tab === 'forgot';
     const isSignIn = tab === 'signin';
-    document.getElementById('tabSignIn').classList.toggle('active', isSignIn);
-    document.getElementById('tabSignUp').classList.toggle('active', !isSignIn);
+    const isSignUp = tab === 'signup';
+    const isReset  = tab === 'reset';
+
+    // Tab bar: hide on forgot/reset screens
+    document.getElementById('authMainTabs').style.display = (isForgot || isReset) ? 'none' : 'flex';
+
+    // Update active tab
+    if (!isForgot && !isReset) {
+      document.getElementById('tabSignIn').classList.toggle('active', isSignIn);
+      document.getElementById('tabSignUp').classList.toggle('active', isSignUp);
+    }
+
+    // Show correct form
     document.getElementById('formSignIn').style.display = isSignIn ? 'block' : 'none';
-    document.getElementById('formSignUp').style.display = isSignIn ? 'none'  : 'block';
-    // Reset to email mode when switching tabs
-    if (isSignIn) setSiMode('email'); else setSuMode('email');
-    // Reset OTP fields
-    ['siOtpField','suOtpField'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display='none'; });
-    ['btnVerifyOtp','btnSuVerifyOtp'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display='none'; });
+    document.getElementById('formSignUp').style.display = isSignUp ? 'block' : 'none';
+    document.getElementById('formForgot').style.display = isForgot ? 'block' : 'none';
+    document.getElementById('formReset').style.display  = isReset  ? 'block' : 'none';
+
+    // Update tagline
+    const taglines = { forgot: 'Reset your password', reset: 'Choose a new password', signin: 'Your gateway to live experiences', signup: 'Your gateway to live experiences' };
+    document.querySelector('.auth-tagline').textContent = taglines[tab] || 'Your gateway to live experiences';
+
+    // Focus first input
     setTimeout(() => {
-      const focus = isSignIn ? 'siEmail' : 'suName';
-      const el = document.getElementById(focus);
+      const focusMap = { signin: 'siEmail', signup: 'suName', forgot: 'fpEmail', reset: 'rpPassword' };
+      const el = document.getElementById(focusMap[tab]);
       if (el) el.focus();
     }, 50);
+  }
+
+  // ── FORGOT PASSWORD ───────────────────────────────────────────────
+  async function handleForgotPassword() {
+    const email = document.getElementById('fpEmail').value.trim();
+    if (!email) { showAuthError('Please enter your email address.'); return; }
+
+    const btn = document.getElementById('btnForgot');
+    btn.disabled = true; btn.textContent = 'Sending…';
+    clearAuthMessages();
+
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname
+    });
+
+    btn.disabled = false; btn.textContent = 'Send Reset Link';
+
+    if (error) { showAuthError(error.message); return; }
+
+    showAuthSuccess('✅ Reset link sent! Check your email inbox (and spam folder).');
+    document.getElementById('fpEmail').value = '';
+  }
+
+  // ── RESET PASSWORD (after clicking email link) ────────────────────
+  async function handleResetPassword() {
+    const password = document.getElementById('rpPassword').value;
+    const confirm  = document.getElementById('rpConfirm').value;
+
+    if (!password || !confirm) { showAuthError('Please fill in both fields.'); return; }
+    if (password.length < 6)   { showAuthError('Password must be at least 6 characters.'); return; }
+    if (password !== confirm)  { showAuthError('Passwords do not match.'); return; }
+
+    const btn = document.getElementById('btnReset');
+    btn.disabled = true; btn.textContent = 'Saving…';
+    clearAuthMessages();
+
+    const { error } = await supabaseClient.auth.updateUser({ password });
+
+    btn.disabled = false; btn.textContent = 'Set New Password';
+
+    if (error) { showAuthError(error.message); return; }
+
+    closeAuthModal();
+    showToast('✅ Password updated! You are now signed in.', 'var(--green)');
+    // Clear hash from URL
+    history.replaceState(null, '', window.location.pathname);
   }
 
   function showAuthError(msg) {
@@ -1659,113 +1709,6 @@ img, video, canvas {
     document.getElementById('suName').value     = '';
     document.getElementById('suEmail').value    = '';
     document.getElementById('suPassword').value = '';
-  }
-
-  // ── PHONE AUTH (Twilio via Supabase) ─────────────────────────────
-  function setSiMode(mode) {
-    const isEmail = mode === 'email';
-    document.getElementById('siModeEmail').classList.toggle('active', isEmail);
-    document.getElementById('siModePhone').classList.toggle('active', !isEmail);
-    document.getElementById('siEmailFields').style.display  = isEmail ? 'block' : 'none';
-    document.getElementById('siPhoneFields').style.display  = isEmail ? 'none'  : 'block';
-    clearAuthMessages();
-  }
-
-  function setSuMode(mode) {
-    const isEmail = mode === 'email';
-    document.getElementById('suModeEmail').classList.toggle('active', isEmail);
-    document.getElementById('suModePhone').classList.toggle('active', !isEmail);
-    document.getElementById('suEmailFields').style.display  = isEmail ? 'block' : 'none';
-    document.getElementById('suPhoneFields').style.display  = isEmail ? 'none'  : 'block';
-    clearAuthMessages();
-  }
-
-  // Sign In — send OTP to phone
-  async function handleSendOtp() {
-    const phone = document.getElementById('siPhone').value.trim();
-    if (!phone) { showAuthError('Please enter your phone number.'); return; }
-
-    const btn = document.getElementById('btnSendOtp');
-    btn.disabled = true; btn.textContent = 'Sending…';
-    clearAuthMessages();
-
-    const { error } = await supabaseClient.auth.signInWithOtp({ phone });
-
-    btn.disabled = false; btn.textContent = 'Resend OTP';
-
-    if (error) { showAuthError(error.message); return; }
-
-    document.getElementById('siOtpField').style.display   = 'block';
-    document.getElementById('btnVerifyOtp').style.display = 'block';
-    btn.textContent = 'Resend OTP';
-    showAuthSuccess('✅ OTP sent! Check your SMS messages.');
-    setTimeout(() => document.getElementById('siOtp').focus(), 100);
-  }
-
-  // Sign In — verify OTP
-  async function handlePhoneVerify() {
-    const phone = document.getElementById('siPhone').value.trim();
-    const token = document.getElementById('siOtp').value.trim();
-    if (!token) { showAuthError('Please enter the OTP code from your SMS.'); return; }
-
-    const btn = document.getElementById('btnVerifyOtp');
-    btn.disabled = true; btn.textContent = 'Verifying…';
-    clearAuthMessages();
-
-    const { error } = await supabaseClient.auth.verifyOtp({ phone, token, type: 'sms' });
-
-    btn.disabled = false; btn.textContent = 'Verify & Sign In';
-
-    if (error) { showAuthError('Invalid or expired OTP. Please try again.'); return; }
-
-    closeAuthModal();
-    showToast('👋 Welcome back!', 'var(--green)');
-  }
-
-  // Sign Up — send OTP
-  async function handlePhoneSignUp() {
-    const phone = document.getElementById('suPhone').value.trim();
-    const name  = document.getElementById('suPhoneName').value.trim();
-    if (!name)  { showAuthError('Please enter your full name.'); return; }
-    if (!phone) { showAuthError('Please enter your phone number.'); return; }
-
-    const btn = document.getElementById('btnSuSendOtp');
-    btn.disabled = true; btn.textContent = 'Sending…';
-    clearAuthMessages();
-
-    const { error } = await supabaseClient.auth.signInWithOtp({
-      phone,
-      options: { data: { full_name: name } }
-    });
-
-    btn.disabled = false; btn.textContent = 'Resend OTP';
-
-    if (error) { showAuthError(error.message); return; }
-
-    document.getElementById('suOtpField').style.display     = 'block';
-    document.getElementById('btnSuVerifyOtp').style.display = 'block';
-    showAuthSuccess('✅ OTP sent! Check your SMS messages.');
-    setTimeout(() => document.getElementById('suOtp').focus(), 100);
-  }
-
-  // Sign Up — verify OTP
-  async function handlePhoneSignUpVerify() {
-    const phone = document.getElementById('suPhone').value.trim();
-    const token = document.getElementById('suOtp').value.trim();
-    if (!token) { showAuthError('Please enter the OTP code from your SMS.'); return; }
-
-    const btn = document.getElementById('btnSuVerifyOtp');
-    btn.disabled = true; btn.textContent = 'Verifying…';
-    clearAuthMessages();
-
-    const { error } = await supabaseClient.auth.verifyOtp({ phone, token, type: 'sms' });
-
-    btn.disabled = false; btn.textContent = 'Verify & Create Account';
-
-    if (error) { showAuthError('Invalid or expired OTP. Please try again.'); return; }
-
-    closeAuthModal();
-    showToast('🎉 Account created! Welcome to TicketVault.', 'var(--green)');
   }
 
   // ── SLIDESHOW ─────────────────────────────────────────────────────
@@ -2586,10 +2529,22 @@ img, video, canvas {
 
   // ── INIT ──────────────────────────────────────────────────────────
   loadEvents();
-  // When auth state changes also reload wishlist heart states
   supabaseClient.auth.onAuthStateChange((event, session) => {
     if (session?.user) loadWishlistIds();
+    // When user clicks reset link in email, show them a new password form
+    if (event === 'PASSWORD_RECOVERY') {
+      openAuthModal(null);
+      switchTab('reset');
+    }
   });
+
+  // Handle password reset — show reset form if URL has access_token
+  if (window.location.hash.includes('type=recovery')) {
+    setTimeout(() => {
+      openAuthModal(null);
+      switchTab('reset');
+    }, 500);
+  }
 
   // ── EVENT DETAIL PAGE ─────────────────────────────────────────────
   let epQty = 1;
@@ -3071,12 +3026,17 @@ img, video, canvas {
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
   }
 
-  // Apply saved theme on load
+  // Light mode is default — only switch to dark if user has explicitly chosen it
   (function() {
     const saved = localStorage.getItem('theme');
-    if (saved === 'light') {
+    const knob  = document.getElementById('themeKnob');
+    if (saved === 'dark') {
+      // User previously chose dark — stay dark
+      document.body.classList.remove('light-mode');
+      if (knob) knob.textContent = '🌙';
+    } else {
+      // Default: light mode
       document.body.classList.add('light-mode');
-      const knob = document.getElementById('themeKnob');
       if (knob) knob.textContent = '☀️';
     }
   })();
