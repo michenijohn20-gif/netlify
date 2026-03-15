@@ -751,36 +751,37 @@ img, video, canvas {
   <div class="search-bar">
     <div class="search-field">
       <label>Search Events</label>
-      <input type="text" placeholder="Artist, event, or venue…"/>
+      <input type="text" id="searchText" placeholder="Artist, event, or venue…" onkeydown="if(event.key==='Enter') doSearch()"/>
     </div>
     <div class="search-field">
       <label>Location</label>
-      <select>
-        <option>All Cities</option>
-        <option>Nairobi</option>
-        <option>Mombasa</option>
-        <option>Kisumu</option>
-        <option>London</option>
-        <option>New York</option>
-        <option>Lagos</option>
+      <select id="searchCity">
+        <option value="">All Cities</option>
+        <option value="Nairobi">Nairobi</option>
+        <option value="Mombasa">Mombasa</option>
+        <option value="Kisumu">Kisumu</option>
+        <option value="London">London</option>
+        <option value="New York">New York</option>
+        <option value="Lagos">Lagos</option>
       </select>
     </div>
     <div class="search-field">
       <label>Date</label>
-      <input type="date"/>
+      <input type="date" id="searchDate"/>
     </div>
     <div class="search-field" style="border-right:none">
       <label>Category</label>
-      <select>
-        <option>All Categories</option>
-        <option>Concerts</option>
-        <option>Festivals</option>
-        <option>Sports</option>
-        <option>Theatre</option>
-        <option>Comedy</option>
+      <select id="searchCategory">
+        <option value="">All Categories</option>
+        <option value="concert">Concerts</option>
+        <option value="festival">Festivals</option>
+        <option value="sports">Sports</option>
+        <option value="theatre">Theatre</option>
+        <option value="comedy">Comedy</option>
+        <option value="art">Art & Culture</option>
       </select>
     </div>
-    <button class="search-btn" onclick="showToast('🔍 Searching events…', '#e8c96d')">Search</button>
+    <button class="search-btn" onclick="doSearch()">Search</button>
   </div>
 </div>
 
@@ -791,29 +792,29 @@ img, video, canvas {
     <div class="section-title">Featured<br/>Event</div>
     <a href="#" class="view-all">View All Featured →</a>
   </div>
-  <div class="featured-banner">
+  <div id="featuredBanner" class="featured-banner">
     <div class="featured-img" style="background:linear-gradient(135deg,#1a0533,#3d0f6e,#6a1faa);">
       <span style="z-index:1;position:relative;filter:drop-shadow(0 0 40px rgba(180,100,255,0.5))">🎵</span>
     </div>
     <div class="featured-content">
-      <div class="featured-tag">🔥 Selling Fast</div>
-      <div class="featured-title">Afrobeats World<br/>Festival 2026</div>
-      <div class="featured-desc">The continent's biggest celebration of Afrobeats, Amapiano & Afro-fusion. Featuring 30+ artists across 3 stages over two nights at Uhuru Gardens.</div>
+      <div class="featured-tag">🔥 Loading…</div>
+      <div class="featured-title" id="featTitle">Loading featured event…</div>
+      <div class="featured-desc" id="featDesc"></div>
       <div class="featured-info">
         <div class="feat-info-item">
           <span class="feat-info-label">Date</span>
-          <span class="feat-info-val">April 18–19, 2026</span>
+          <span class="feat-info-val" id="featDate">—</span>
         </div>
         <div class="feat-info-item">
           <span class="feat-info-label">Venue</span>
-          <span class="feat-info-val">Uhuru Gardens, Nairobi</span>
+          <span class="feat-info-val" id="featVenue">—</span>
         </div>
         <div class="feat-info-item">
           <span class="feat-info-label">From</span>
-          <span class="feat-info-val" style="color:var(--gold)">KES 3,500</span>
+          <span class="feat-info-val" id="featPrice" style="color:var(--gold)">—</span>
         </div>
       </div>
-      <button class="btn-primary" onclick="handleGetTickets('','Afrobeats World Festival 2026','April 18–19, 2026','Uhuru Gardens, Nairobi')">Get Tickets</button>
+      <button class="btn-primary" id="featBtn" onclick="">Get Tickets</button>
     </div>
   </div>
 </section>
@@ -844,31 +845,8 @@ img, video, canvas {
     <div class="section-title">Iconic Venues</div>
     <a href="#" class="view-all">Explore All →</a>
   </div>
-  <div class="venues-grid">
-    <div class="venue-card">
-      <div class="venue-icon">🏟</div>
-      <div class="venue-name">Nyayo Stadium</div>
-      <div class="venue-city">Nairobi, Kenya</div>
-      <div class="venue-count">12 Upcoming Events</div>
-    </div>
-    <div class="venue-card">
-      <div class="venue-icon">🎪</div>
-      <div class="venue-name">Uhuru Gardens</div>
-      <div class="venue-city">Nairobi, Kenya</div>
-      <div class="venue-count">8 Upcoming Events</div>
-    </div>
-    <div class="venue-card">
-      <div class="venue-icon">🏛</div>
-      <div class="venue-name">Kenya National Theatre</div>
-      <div class="venue-city">Nairobi, Kenya</div>
-      <div class="venue-count">6 Upcoming Events</div>
-    </div>
-    <div class="venue-card">
-      <div class="venue-icon">🌊</div>
-      <div class="venue-name">Mombasa Arena</div>
-      <div class="venue-city">Mombasa, Kenya</div>
-      <div class="venue-count">4 Upcoming Events</div>
-    </div>
+  <div class="venues-grid" id="venuesGrid">
+    <div style="color:var(--muted);text-align:center;grid-column:1/-1;padding:20px">Loading venues…</div>
   </div>
 </section>
 
@@ -886,47 +864,47 @@ img, video, canvas {
 <footer>
   <div class="footer-grid">
     <div class="footer-brand">
-      <a href="#" class="logo">Ticket<span>Vault</span></a>
-      <p>Your gateway to live experiences. Trusted by 3 million+ fans across Africa and beyond.</p>
+      <a href="#home" class="logo">Ticket<span>Vault</span></a>
+      <p>Your gateway to live experiences. Trusted by fans across Africa and beyond.</p>
     </div>
     <div class="footer-col">
       <h4>Discover</h4>
       <ul>
-        <li><a href="#">Concerts</a></li>
-        <li><a href="#">Festivals</a></li>
-        <li><a href="#">Sports</a></li>
-        <li><a href="#">Theatre & Arts</a></li>
-        <li><a href="#">Comedy</a></li>
+        <li><a href="#events" onclick="filterCatByName('concert')">Concerts</a></li>
+        <li><a href="#events" onclick="filterCatByName('festival')">Festivals</a></li>
+        <li><a href="#events" onclick="filterCatByName('sports')">Sports</a></li>
+        <li><a href="#events" onclick="filterCatByName('theatre')">Theatre & Arts</a></li>
+        <li><a href="#events" onclick="filterCatByName('comedy')">Comedy</a></li>
       </ul>
     </div>
     <div class="footer-col">
       <h4>Account</h4>
       <ul>
-        <li><a href="#">Sign In</a></li>
-        <li><a href="#">Register</a></li>
-        <li><a href="#">My Tickets</a></li>
-        <li><a href="#">Order History</a></li>
-        <li><a href="#">Saved Events</a></li>
+        <li><a href="#" onclick="openAuthModal(event)">Sign In</a></li>
+        <li><a href="#" onclick="switchTab('signup');openAuthModal(event)">Register</a></li>
+        <li><a href="#" onclick="openPanel('tickets')">My Tickets</a></li>
+        <li><a href="#" onclick="openPanel('tickets')">Order History</a></li>
+        <li><a href="#" onclick="openPanel('wishlist')">Saved Events</a></li>
       </ul>
     </div>
     <div class="footer-col">
       <h4>Company</h4>
       <ul>
-        <li><a href="#">About Us</a></li>
-        <li><a href="#">For Organizers</a></li>
-        <li><a href="#">Help Center</a></li>
-        <li><a href="#">Privacy Policy</a></li>
-        <li><a href="#">Terms of Use</a></li>
+        <li><a href="#" onclick="showToast('About page coming soon!','var(--gold)')">About Us</a></li>
+        <li><a href="#" onclick="showToast('Organizer portal coming soon!','var(--gold)')">For Organizers</a></li>
+        <li><a href="#" onclick="showToast('Help center coming soon!','var(--gold)')">Help Center</a></li>
+        <li><a href="#" onclick="showToast('Privacy policy coming soon!','var(--gold)')">Privacy Policy</a></li>
+        <li><a href="#" onclick="showToast('Terms coming soon!','var(--gold)')">Terms of Use</a></li>
       </ul>
     </div>
   </div>
   <div class="footer-bottom">
     <p>© 2026 TicketVault. All rights reserved. Built with ♥ for live music.</p>
     <div class="social-links">
-      <a class="social-btn" href="#" title="Twitter">𝕏</a>
-      <a class="social-btn" href="#" title="Instagram">📷</a>
-      <a class="social-btn" href="#" title="Facebook">f</a>
-      <a class="social-btn" href="#" title="TikTok">♪</a>
+      <a class="social-btn" href="https://twitter.com" target="_blank" title="Twitter">𝕏</a>
+      <a class="social-btn" href="https://instagram.com" target="_blank" title="Instagram">📷</a>
+      <a class="social-btn" href="https://facebook.com" target="_blank" title="Facebook">f</a>
+      <a class="social-btn" href="https://tiktok.com" target="_blank" title="TikTok">♪</a>
     </div>
   </div>
 </footer>
@@ -1314,6 +1292,175 @@ img, video, canvas {
     console.log('✅ Events loaded:', data.length, 'events');
     allEvents = data;
     renderEvents('all');
+    loadFeaturedEvent();
+    renderVenues(data);
+  }
+
+  // ── FEATURED EVENT ────────────────────────────────────────────────
+  async function loadFeaturedEvent() {
+    // Check localStorage for admin-chosen featured event id
+    const featuredId = localStorage.getItem('featuredEventId');
+    let featured = null;
+
+    if (featuredId) {
+      featured = allEvents.find(e => e.id === featuredId);
+    }
+    // Fallback: first event
+    if (!featured && allEvents.length > 0) featured = allEvents[0];
+    if (!featured) return;
+
+    const dateStr = featured.date
+      ? new Date(featured.date).toLocaleDateString('en-KE', { day:'numeric', month:'short', year:'numeric' })
+      : '—';
+
+    document.getElementById('featTitle').textContent = featured.title;
+    document.getElementById('featDesc').textContent  = featured.description || '';
+    document.getElementById('featDate').textContent  = dateStr;
+    document.getElementById('featVenue').textContent = featured.venue + (featured.city ? ', ' + featured.city : '');
+
+    // Load lowest ticket price
+    const { data: tickets } = await supabaseClient
+      .from('ticket_types').select('price')
+      .eq('event_id', featured.id).order('price', { ascending: true }).limit(1);
+    document.getElementById('featPrice').textContent =
+      tickets && tickets.length ? `KES ${Number(tickets[0].price).toLocaleString()}` : 'See tickets';
+
+    // Update image
+    const featImg = document.querySelector('.featured-img');
+    if (featured.image_url) {
+      featImg.style.backgroundImage = `url('${featured.image_url}')`;
+      featImg.style.backgroundSize  = 'cover';
+      featImg.style.backgroundPosition = 'center';
+      featImg.innerHTML = '';
+    }
+
+    // Update button
+    const btn = document.getElementById('featBtn');
+    btn.onclick = function() {
+      handleGetTickets(featured.id, featured.title, dateStr, featured.venue);
+    };
+  }
+
+  // ── VENUES (dynamic from events data) ────────────────────────────
+  function renderVenues(events) {
+    const today = new Date(); today.setHours(0,0,0,0);
+    // Count upcoming events per venue
+    const venueCounts = {};
+    const venueCity   = {};
+    events.forEach(e => {
+      if (!e.venue) return;
+      const eDate = e.date ? new Date(e.date) : null;
+      if (eDate && eDate >= today) {
+        venueCounts[e.venue] = (venueCounts[e.venue] || 0) + 1;
+        venueCity[e.venue]   = e.city || '';
+      }
+    });
+
+    // Sort by event count descending, take top 4
+    const venueIcons = { 'stadium':'🏟', 'gardens':'🌿', 'arena':'🎪', 'theatre':'🏛',
+      'theater':'🏛', 'bar':'🍻', 'park':'🌳', 'ground':'⚽', 'kicc':'🏢',
+      'carnivore':'🥩', 'alchemist':'🍻', 'beach':'🌊', 'centre':'🎨', 'center':'🎨' };
+
+    function getIcon(venue) {
+      const v = venue.toLowerCase();
+      for (const [key, icon] of Object.entries(venueIcons)) {
+        if (v.includes(key)) return icon;
+      }
+      return '📍';
+    }
+
+    const sorted = Object.entries(venueCounts)
+      .sort((a, b) => b[1] - a[1]).slice(0, 4);
+
+    const grid = document.getElementById('venuesGrid');
+    if (sorted.length === 0) {
+      grid.innerHTML = '<div style="color:var(--muted);text-align:center;grid-column:1/-1;padding:20px">No upcoming events at venues yet.</div>';
+      return;
+    }
+
+    grid.innerHTML = sorted.map(([venue, count]) => `
+      <div class="venue-card" onclick="filterByVenue('${venue.replace(/'/g,"\\'")}')">
+        <div class="venue-icon">${getIcon(venue)}</div>
+        <div class="venue-name">${venue}</div>
+        <div class="venue-city">${venueCity[venue] || ''}</div>
+        <div class="venue-count">${count} Upcoming Event${count !== 1 ? 's' : ''}</div>
+      </div>`).join('');
+  }
+
+  // Filter events by venue — scrolls to events section and shows filtered results
+  function filterByVenue(venue) {
+    document.getElementById('events').scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => {
+      const grid = document.getElementById('eventsGrid');
+      const filtered = allEvents.filter(e =>
+        e.venue && e.venue.toLowerCase().includes(venue.toLowerCase())
+      );
+      // Reset category pills
+      document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+      document.querySelector('.cat-pill').classList.add('active');
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<p style="color:var(--muted);grid-column:1/-1;text-align:center;padding:40px">No events at ${venue}.</p>`;
+        return;
+      }
+      // Temporarily set allEvents subset for rendering
+      const backup = allEvents;
+      allEvents = filtered;
+      renderEvents('all');
+      allEvents = backup;
+
+      showToast(`📍 Showing events at ${venue}`, 'var(--gold)');
+    }, 400);
+  }
+
+  // ── SEARCH ────────────────────────────────────────────────────────
+  function doSearch() {
+    const text     = (document.getElementById('searchText').value || '').toLowerCase().trim();
+    const city     = (document.getElementById('searchCity').value || '').toLowerCase();
+    const date     = document.getElementById('searchDate').value;
+    const category = document.getElementById('searchCategory').value.toLowerCase();
+
+    // If no filters, reset
+    if (!text && !city && !date && !category) {
+      renderEvents('all');
+      showToast('Showing all events', 'var(--muted)');
+      return;
+    }
+
+    const results = allEvents.filter(e => {
+      const matchText = !text || [e.title, e.venue, e.city, e.description]
+        .some(f => f && f.toLowerCase().includes(text));
+      const matchCity     = !city     || (e.city && e.city.toLowerCase().includes(city));
+      const matchDate     = !date     || (e.date && e.date === date);
+      const matchCategory = !category || (e.category && e.category.toLowerCase() === category);
+      return matchText && matchCity && matchDate && matchCategory;
+    });
+
+    // Scroll to events section
+    document.getElementById('events').scrollIntoView({ behavior: 'smooth' });
+
+    setTimeout(() => {
+      const grid = document.getElementById('eventsGrid');
+      if (results.length === 0) {
+        grid.innerHTML = '<p style="color:var(--muted);grid-column:1/-1;text-align:center;padding:40px">No events match your search. Try different filters.</p>';
+        showToast('No events found', 'var(--muted)');
+        return;
+      }
+      const backup = allEvents;
+      allEvents = results;
+      renderEvents('all');
+      allEvents = backup;
+      showToast(`🔍 Found ${results.length} event${results.length !== 1 ? 's' : ''}`, 'var(--gold)');
+    }, 400);
+  }
+
+  // ── FILTER BY CATEGORY NAME (for footer links) ────────────────────
+  function filterCatByName(cat) {
+    setTimeout(() => {
+      const pill = [...document.querySelectorAll('.cat-pill')]
+        .find(p => p.getAttribute('onclick') && p.getAttribute('onclick').includes(`'${cat}'`));
+      if (pill) { pill.click(); }
+    }, 300);
   }
 
   // ── RENDER EVENTS ─────────────────────────────────────────────────
@@ -1839,7 +1986,24 @@ img, video, canvas {
     document.getElementById('adminStatPublished').textContent = published;
     document.getElementById('adminStatBookings').textContent  = bookings.length;
     document.getElementById('adminStatRevenue').textContent   = revenue.toLocaleString();
+
+    // Populate featured event selector
+    const currentFeatId = localStorage.getItem('featuredEventId') || '';
+    const sel = document.getElementById('featuredEventSelect');
+    sel.innerHTML = events.filter(e => e.is_published).map(e =>
+      `<option value="${e.id}" ${e.id === currentFeatId ? 'selected' : ''}>${e.title}</option>`
+    ).join('');
+
     renderAdminTable(events);
+  }
+
+  function saveFeaturedEvent() {
+    const sel = document.getElementById('featuredEventSelect');
+    const id  = sel.value;
+    if (!id) return;
+    localStorage.setItem('featuredEventId', id);
+    loadFeaturedEvent();
+    showToast('⚡ Featured event updated!', 'var(--gold)');
   }
 
   function renderAdminTable(events) {
@@ -1886,7 +2050,6 @@ img, video, canvas {
     showToast(current ? '🔒 Event unpublished' : '✅ Event published!', 'var(--green)');
     loadAdminData(); loadEvents();
   }
-
   async function openEventForm(eventId) {
     document.getElementById('adminFormMsg').textContent  = '';
     document.getElementById('adminSaveBtn').disabled     = false;
@@ -2104,6 +2267,20 @@ img, video, canvas {
           <div class="admin-stat-num" id="adminStatRevenue">—</div>
           <div class="admin-stat-lbl">Revenue (KES)</div>
         </div>
+      </div>
+
+      <!-- Featured Event Selector -->
+      <div class="admin-section-header" style="margin-bottom:12px">
+        <div class="admin-section-title">⚡ Featured Event</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:32px;display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <label style="font-size:0.72rem;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px">Select Featured Event</label>
+          <select id="featuredEventSelect" style="background:var(--deep);border:1px solid var(--border);border-radius:7px;padding:10px 14px;color:var(--white);font-family:var(--font-body);font-size:0.9rem;outline:none;width:100%">
+            <option value="">Loading events…</option>
+          </select>
+        </div>
+        <button class="admin-add-btn" style="margin-top:22px" onclick="saveFeaturedEvent()">⚡ Set as Featured</button>
       </div>
 
       <!-- Events Table -->
