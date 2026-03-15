@@ -80,59 +80,131 @@ img, video, canvas {
     }
     .nav-cta:hover { background: #f0d47a !important; color: var(--black) !important; }
 
-    /* ── HERO ── */
+    /* ── HERO SLIDESHOW ── */
     .hero {
-      min-height: 62vh;
-      display: flex; flex-direction: column; justify-content: flex-end;
-      padding: 0 48px 56px;
+      height: 68vh; min-height: 480px; max-height: 740px;
       position: relative; overflow: hidden;
     }
-    .hero-bg {
+    .slides-track {
+      display: flex; height: 100%;
+      transition: transform 0.8s cubic-bezier(0.77,0,0.18,1);
+    }
+    .slide {
+      min-width: 100%; height: 100%; position: relative; flex-shrink: 0;
+    }
+    .slide-bg {
       position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse 80% 60% at 60% 40%, rgba(232,201,109,0.08) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 50% at 20% 80%, rgba(78,203,113,0.06) 0%, transparent 60%),
-        linear-gradient(160deg, #0a0a0a 0%, #111118 50%, #0d0d15 100%);
+      background-size: cover; background-position: center;
+      transform: scale(1.06);
+      transition: transform 6s ease;
     }
-    .hero-grid {
+    .slide.active .slide-bg { transform: scale(1); }
+    .slide-overlay {
       position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 60px 60px;
-      mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+      background: linear-gradient(
+        to right,
+        rgba(10,10,10,0.88) 0%,
+        rgba(10,10,10,0.55) 50%,
+        rgba(10,10,10,0.15) 100%
+      );
     }
-    .hero-tag {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(232,201,109,0.1); border: 1px solid rgba(232,201,109,0.3);
-      color: var(--gold); padding: 6px 14px; border-radius: 20px;
-      font-size: 0.75rem; font-weight: 600; letter-spacing: 1.5px;
-      text-transform: uppercase; margin-bottom: 28px;
-      animation: fadeUp 0.8s ease both;
+    body.light-mode .slide-overlay {
+      background: linear-gradient(
+        to right,
+        rgba(245,243,238,0.9) 0%,
+        rgba(245,243,238,0.55) 55%,
+        rgba(245,243,238,0.1) 100%
+      );
     }
-    .hero-tag::before { content: '●'; font-size: 0.5rem; animation: pulse 2s ease infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    .hero h1 {
+    .slide-content {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 0 48px; max-width: 640px;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.6s 0.3s ease, transform 0.6s 0.3s ease;
+    }
+    .slide.active .slide-content { opacity: 1; transform: none; }
+    .slide-cat {
+      font-size: 0.7rem; letter-spacing: 2.5px; text-transform: uppercase;
+      color: var(--gold); font-weight: 700; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .slide-cat::before { content: ''; width: 24px; height: 2px; background: var(--gold); display: inline-block; border-radius: 2px; }
+    .slide-title {
       font-family: var(--font-display);
-      font-size: clamp(2.2rem, 5.5vw, 4.8rem);
-      font-weight: 900; line-height: 0.95;
-      letter-spacing: -2px;
-      max-width: 680px;
-      animation: fadeUp 0.8s 0.1s ease both;
+      font-size: clamp(1.8rem, 4.5vw, 3.6rem);
+      font-weight: 900; line-height: 1.05;
+      letter-spacing: -1.5px; margin-bottom: 12px;
+      color: var(--white);
     }
-    .hero h1 em { color: var(--gold); font-style: italic; }
-    .hero-sub {
-      max-width: 440px; color: var(--muted);
-      font-size: 0.95rem; font-weight: 300;
-      margin: 16px 0 28px;
-      animation: fadeUp 0.8s 0.2s ease both;
+    .slide-meta {
+      font-size: 0.9rem; color: rgba(245,243,238,0.65);
+      margin-bottom: 28px; display: flex; gap: 18px; flex-wrap: wrap;
     }
-    .hero-actions {
-      display: flex; gap: 16px; align-items: center;
-      animation: fadeUp 0.8s 0.3s ease both;
+    body.light-mode .slide-meta { color: #5a5a6a; }
+    .slide-meta span { display: flex; align-items: center; gap: 5px; }
+    .slide-actions { display: flex; gap: 12px; align-items: center; }
+    .slide-btn-primary {
+      background: var(--gold); color: #fff;
+      padding: 11px 26px; border-radius: 5px;
+      font-family: var(--font-body); font-weight: 700;
+      font-size: 0.875rem; border: none; cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
+    .slide-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(232,201,109,0.35); }
+    .slide-btn-ghost {
+      color: var(--white); padding: 11px 20px;
+      border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;
+      font-family: var(--font-body); font-weight: 500;
+      font-size: 0.875rem; cursor: pointer; background: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    body.light-mode .slide-btn-ghost { color: #1a1a1a; border-color: rgba(0,0,0,0.2); }
+    .slide-btn-ghost:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); }
+    /* Dots */
+    .slide-dots {
+      position: absolute; bottom: 24px; left: 48px;
+      display: flex; gap: 8px; z-index: 10;
+    }
+    .slide-dot {
+      width: 24px; height: 3px; border-radius: 2px;
+      background: rgba(255,255,255,0.3); cursor: pointer;
+      transition: background 0.3s, width 0.3s;
+    }
+    .slide-dot.active { background: var(--gold); width: 40px; }
+    /* Arrows */
+    .slide-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(0,0,0,0.3); backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.15); border-radius: 50%;
+      width: 40px; height: 40px; display: flex; align-items: center;
+      justify-content: center; cursor: pointer; z-index: 10; color: var(--white);
+      transition: background 0.2s, opacity 0.2s; font-size: 1rem;
+    }
+    .slide-arrow:hover { background: rgba(0,0,0,0.6); }
+    .slide-arrow.prev { left: 16px; }
+    .slide-arrow.next { right: 16px; }
+    /* Slide counter */
+    .slide-counter {
+      position: absolute; bottom: 24px; right: 48px; z-index: 10;
+      font-size: 0.75rem; color: rgba(255,255,255,0.5); font-weight: 500;
+    }
+    /* Skeleton slides while loading */
+    .slide-skeleton {
+      position: absolute; inset: 0;
+      background: linear-gradient(160deg, #0a0a0a 0%, #111118 50%, #0d0d15 100%);
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 0 48px;
+    }
+    .skeleton-line {
+      border-radius: 4px; background: rgba(255,255,255,0.07);
+      animation: shimmer 1.6s infinite linear;
+      background-image: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.05) 100%);
+      background-size: 200% 100%;
+    }
+    /* btn-primary used outside hero */
     .btn-primary {
-      background: var(--gold); color: #0a0a0a;
+      background: var(--gold); color: #fff;
       padding: 12px 28px; border-radius: 4px;
       font-family: var(--font-body); font-weight: 700;
       font-size: 0.9rem; letter-spacing: 0.3px;
@@ -149,17 +221,6 @@ img, video, canvas {
       display: inline-flex; align-items: center; gap: 8px;
     }
     .btn-ghost:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
-    .hero-stats {
-      position: absolute; right: 48px; bottom: 56px;
-      display: flex; flex-direction: column; gap: 18px; text-align: right;
-      animation: fadeUp 0.8s 0.4s ease both;
-    }
-    .stat-num {
-      font-family: var(--font-display); font-size: 2rem;
-      font-weight: 700; color: var(--white); line-height: 1;
-    }
-    .stat-num span { color: var(--gold); }
-    .stat-label { font-size: 0.72rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
 
     @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
     @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
@@ -1001,30 +1062,23 @@ img, video, canvas {
   </ul>
 </nav>
 
-<!-- HERO -->
+<!-- HERO SLIDESHOW -->
 <section class="hero" id="home">
-  <div class="hero-bg"></div>
-  <div class="hero-grid"></div>
-  <div class="hero-tag">Now Live — 2026 Season</div>
-  <h1>Every<br/><em>Live</em><br/>Moment.</h1>
-  <p class="hero-sub">Discover the world's most electrifying concerts, festivals, sports, and theatre. Your next unforgettable night starts here.</p>
-  <div class="hero-actions">
-    <a href="#events" class="btn-primary">Browse Events</a>
+  <!-- Skeleton shown while events load -->
+  <div class="slide-skeleton" id="heroSkeleton">
+    <div class="skeleton-line" style="width:80px;height:12px;margin-bottom:18px"></div>
+    <div class="skeleton-line" style="width:420px;max-width:80%;height:44px;margin-bottom:12px"></div>
+    <div class="skeleton-line" style="width:300px;max-width:65%;height:44px;margin-bottom:20px"></div>
+    <div class="skeleton-line" style="width:240px;max-width:60%;height:16px;margin-bottom:28px"></div>
+    <div class="skeleton-line" style="width:140px;height:40px;border-radius:5px"></div>
   </div>
-  <div class="hero-stats">
-    <div>
-      <div class="stat-num">12<span>K+</span></div>
-      <div class="stat-label">Events Monthly</div>
-    </div>
-    <div>
-      <div class="stat-num">3<span>M+</span></div>
-      <div class="stat-label">Tickets Sold</div>
-    </div>
-    <div>
-      <div class="stat-num">98<span>%</span></div>
-      <div class="stat-label">Happy Fans</div>
-    </div>
-  </div>
+  <!-- Slides injected by JS -->
+  <div class="slides-track" id="slidesTrack"></div>
+  <!-- Controls -->
+  <button class="slide-arrow prev" id="slidePrev" onclick="slideMove(-1)" style="display:none">‹</button>
+  <button class="slide-arrow next" id="slideNext" onclick="slideMove(1)" style="display:none">›</button>
+  <div class="slide-dots" id="slideDots"></div>
+  <div class="slide-counter" id="slideCounter"></div>
 </section>
 
 <!-- SEARCH -->
@@ -1307,22 +1361,44 @@ img, video, canvas {
       <button class="auth-tab" id="tabSignUp" onclick="switchTab('signup')">Create Account</button>
     </div>
 
-    <!-- Error / Success messages -->
+    <!-- Error / Success -->
     <div class="auth-error" id="authError"></div>
     <div class="auth-success" id="authSuccess"></div>
 
     <!-- SIGN IN FORM -->
     <div id="formSignIn">
-      <div class="auth-field">
-        <label>Email</label>
-        <input type="email" id="siEmail" placeholder="you@example.com"/>
+      <!-- Toggle email/phone -->
+      <div style="display:flex;gap:8px;margin-bottom:18px">
+        <button id="siModeEmail" class="auth-tab active" style="flex:1;font-size:0.78rem;padding:7px" onclick="setSiMode('email')">📧 Email</button>
+        <button id="siModePhone" class="auth-tab" style="flex:1;font-size:0.78rem;padding:7px" onclick="setSiMode('phone')">📱 Phone</button>
       </div>
-      <div class="auth-field">
-        <label>Password</label>
-        <input type="password" id="siPassword" placeholder="Your password"
-               onkeydown="if(event.key==='Enter') handleSignIn()"/>
+      <!-- Email login -->
+      <div id="siEmailFields">
+        <div class="auth-field">
+          <label>Email</label>
+          <input type="email" id="siEmail" placeholder="you@example.com"/>
+        </div>
+        <div class="auth-field">
+          <label>Password</label>
+          <input type="password" id="siPassword" placeholder="Your password"
+                 onkeydown="if(event.key==='Enter') handleSignIn()"/>
+        </div>
+        <button class="auth-submit" id="btnSignIn" onclick="handleSignIn()">Sign In</button>
       </div>
-      <button class="auth-submit" id="btnSignIn" onclick="handleSignIn()">Sign In</button>
+      <!-- Phone OTP login -->
+      <div id="siPhoneFields" style="display:none">
+        <div class="auth-field">
+          <label>Phone Number</label>
+          <input type="tel" id="siPhone" placeholder="+254 7XX XXX XXX"/>
+        </div>
+        <div class="auth-field" id="siOtpField" style="display:none">
+          <label>OTP Code (sent via SMS)</label>
+          <input type="text" id="siOtp" placeholder="Enter 6-digit code" maxlength="6"
+                 onkeydown="if(event.key==='Enter') handlePhoneVerify()"/>
+        </div>
+        <button class="auth-submit" id="btnSendOtp" onclick="handleSendOtp()">Send OTP</button>
+        <button class="auth-submit" id="btnVerifyOtp" style="display:none" onclick="handlePhoneVerify()">Verify & Sign In</button>
+      </div>
       <p style="text-align:center;color:var(--muted);font-size:0.8rem;margin-top:16px">
         No account? <a href="#" style="color:var(--gold);text-decoration:none" onclick="switchTab('signup')">Create one free →</a>
       </p>
@@ -1330,20 +1406,46 @@ img, video, canvas {
 
     <!-- SIGN UP FORM -->
     <div id="formSignUp" style="display:none">
-      <div class="auth-field">
-        <label>Full Name</label>
-        <input type="text" id="suName" placeholder="Your full name"/>
+      <!-- Toggle email/phone -->
+      <div style="display:flex;gap:8px;margin-bottom:18px">
+        <button id="suModeEmail" class="auth-tab active" style="flex:1;font-size:0.78rem;padding:7px" onclick="setSuMode('email')">📧 Email</button>
+        <button id="suModePhone" class="auth-tab" style="flex:1;font-size:0.78rem;padding:7px" onclick="setSuMode('phone')">📱 Phone</button>
       </div>
-      <div class="auth-field">
-        <label>Email</label>
-        <input type="email" id="suEmail" placeholder="you@example.com"/>
+      <!-- Email signup -->
+      <div id="suEmailFields">
+        <div class="auth-field">
+          <label>Full Name</label>
+          <input type="text" id="suName" placeholder="Your full name"/>
+        </div>
+        <div class="auth-field">
+          <label>Email</label>
+          <input type="email" id="suEmail" placeholder="you@example.com"/>
+        </div>
+        <div class="auth-field">
+          <label>Password</label>
+          <input type="password" id="suPassword" placeholder="Min 6 characters"
+                 onkeydown="if(event.key==='Enter') handleSignUp()"/>
+        </div>
+        <button class="auth-submit" id="btnSignUp" onclick="handleSignUp()">Create Account</button>
       </div>
-      <div class="auth-field">
-        <label>Password</label>
-        <input type="password" id="suPassword" placeholder="Min 6 characters"
-               onkeydown="if(event.key==='Enter') handleSignUp()"/>
+      <!-- Phone signup -->
+      <div id="suPhoneFields" style="display:none">
+        <div class="auth-field">
+          <label>Full Name</label>
+          <input type="text" id="suPhoneName" placeholder="Your full name"/>
+        </div>
+        <div class="auth-field">
+          <label>Phone Number</label>
+          <input type="tel" id="suPhone" placeholder="+254 7XX XXX XXX"/>
+        </div>
+        <div class="auth-field" id="suOtpField" style="display:none">
+          <label>OTP Code (sent via SMS)</label>
+          <input type="text" id="suOtp" placeholder="Enter 6-digit code" maxlength="6"
+                 onkeydown="if(event.key==='Enter') handlePhoneSignUpVerify()"/>
+        </div>
+        <button class="auth-submit" id="btnSuSendOtp" onclick="handlePhoneSignUp()">Send OTP</button>
+        <button class="auth-submit" id="btnSuVerifyOtp" style="display:none" onclick="handlePhoneSignUpVerify()">Verify & Create Account</button>
       </div>
-      <button class="auth-submit" id="btnSignUp" onclick="handleSignUp()">Create Account</button>
       <p style="text-align:center;color:var(--muted);font-size:0.8rem;margin-top:16px">
         Already have an account? <a href="#" style="color:var(--gold);text-decoration:none" onclick="switchTab('signin')">Sign in →</a>
       </p>
@@ -1466,8 +1568,15 @@ img, video, canvas {
     document.getElementById('tabSignUp').classList.toggle('active', !isSignIn);
     document.getElementById('formSignIn').style.display = isSignIn ? 'block' : 'none';
     document.getElementById('formSignUp').style.display = isSignIn ? 'none'  : 'block';
+    // Reset to email mode when switching tabs
+    if (isSignIn) setSiMode('email'); else setSuMode('email');
+    // Reset OTP fields
+    ['siOtpField','suOtpField'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display='none'; });
+    ['btnVerifyOtp','btnSuVerifyOtp'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display='none'; });
     setTimeout(() => {
-      document.getElementById(isSignIn ? 'siEmail' : 'suName').focus();
+      const focus = isSignIn ? 'siEmail' : 'suName';
+      const el = document.getElementById(focus);
+      if (el) el.focus();
     }, 50);
   }
 
@@ -1547,13 +1656,209 @@ img, video, canvas {
     }
 
     showAuthSuccess('✅ Account created! Check your email to confirm, then sign in.');
-    // Clear the form fields
     document.getElementById('suName').value     = '';
     document.getElementById('suEmail').value    = '';
     document.getElementById('suPassword').value = '';
   }
 
-  // ── LOAD EVENTS ───────────────────────────────────────────────────
+  // ── PHONE AUTH (Twilio via Supabase) ─────────────────────────────
+  function setSiMode(mode) {
+    const isEmail = mode === 'email';
+    document.getElementById('siModeEmail').classList.toggle('active', isEmail);
+    document.getElementById('siModePhone').classList.toggle('active', !isEmail);
+    document.getElementById('siEmailFields').style.display  = isEmail ? 'block' : 'none';
+    document.getElementById('siPhoneFields').style.display  = isEmail ? 'none'  : 'block';
+    clearAuthMessages();
+  }
+
+  function setSuMode(mode) {
+    const isEmail = mode === 'email';
+    document.getElementById('suModeEmail').classList.toggle('active', isEmail);
+    document.getElementById('suModePhone').classList.toggle('active', !isEmail);
+    document.getElementById('suEmailFields').style.display  = isEmail ? 'block' : 'none';
+    document.getElementById('suPhoneFields').style.display  = isEmail ? 'none'  : 'block';
+    clearAuthMessages();
+  }
+
+  // Sign In — send OTP to phone
+  async function handleSendOtp() {
+    const phone = document.getElementById('siPhone').value.trim();
+    if (!phone) { showAuthError('Please enter your phone number.'); return; }
+
+    const btn = document.getElementById('btnSendOtp');
+    btn.disabled = true; btn.textContent = 'Sending…';
+    clearAuthMessages();
+
+    const { error } = await supabaseClient.auth.signInWithOtp({ phone });
+
+    btn.disabled = false; btn.textContent = 'Resend OTP';
+
+    if (error) { showAuthError(error.message); return; }
+
+    document.getElementById('siOtpField').style.display   = 'block';
+    document.getElementById('btnVerifyOtp').style.display = 'block';
+    btn.textContent = 'Resend OTP';
+    showAuthSuccess('✅ OTP sent! Check your SMS messages.');
+    setTimeout(() => document.getElementById('siOtp').focus(), 100);
+  }
+
+  // Sign In — verify OTP
+  async function handlePhoneVerify() {
+    const phone = document.getElementById('siPhone').value.trim();
+    const token = document.getElementById('siOtp').value.trim();
+    if (!token) { showAuthError('Please enter the OTP code from your SMS.'); return; }
+
+    const btn = document.getElementById('btnVerifyOtp');
+    btn.disabled = true; btn.textContent = 'Verifying…';
+    clearAuthMessages();
+
+    const { error } = await supabaseClient.auth.verifyOtp({ phone, token, type: 'sms' });
+
+    btn.disabled = false; btn.textContent = 'Verify & Sign In';
+
+    if (error) { showAuthError('Invalid or expired OTP. Please try again.'); return; }
+
+    closeAuthModal();
+    showToast('👋 Welcome back!', 'var(--green)');
+  }
+
+  // Sign Up — send OTP
+  async function handlePhoneSignUp() {
+    const phone = document.getElementById('suPhone').value.trim();
+    const name  = document.getElementById('suPhoneName').value.trim();
+    if (!name)  { showAuthError('Please enter your full name.'); return; }
+    if (!phone) { showAuthError('Please enter your phone number.'); return; }
+
+    const btn = document.getElementById('btnSuSendOtp');
+    btn.disabled = true; btn.textContent = 'Sending…';
+    clearAuthMessages();
+
+    const { error } = await supabaseClient.auth.signInWithOtp({
+      phone,
+      options: { data: { full_name: name } }
+    });
+
+    btn.disabled = false; btn.textContent = 'Resend OTP';
+
+    if (error) { showAuthError(error.message); return; }
+
+    document.getElementById('suOtpField').style.display     = 'block';
+    document.getElementById('btnSuVerifyOtp').style.display = 'block';
+    showAuthSuccess('✅ OTP sent! Check your SMS messages.');
+    setTimeout(() => document.getElementById('suOtp').focus(), 100);
+  }
+
+  // Sign Up — verify OTP
+  async function handlePhoneSignUpVerify() {
+    const phone = document.getElementById('suPhone').value.trim();
+    const token = document.getElementById('suOtp').value.trim();
+    if (!token) { showAuthError('Please enter the OTP code from your SMS.'); return; }
+
+    const btn = document.getElementById('btnSuVerifyOtp');
+    btn.disabled = true; btn.textContent = 'Verifying…';
+    clearAuthMessages();
+
+    const { error } = await supabaseClient.auth.verifyOtp({ phone, token, type: 'sms' });
+
+    btn.disabled = false; btn.textContent = 'Verify & Create Account';
+
+    if (error) { showAuthError('Invalid or expired OTP. Please try again.'); return; }
+
+    closeAuthModal();
+    showToast('🎉 Account created! Welcome to TicketVault.', 'var(--green)');
+  }
+
+  // ── SLIDESHOW ─────────────────────────────────────────────────────
+  let slideIndex    = 0;
+  let slideTotal    = 0;
+  let slideTimer    = null;
+  let slideEvents   = [];
+
+  function buildSlideshow(events) {
+    slideEvents = events.slice(0, 6); // max 6 slides
+    slideTotal  = slideEvents.length;
+    if (slideTotal === 0) return;
+
+    const track = document.getElementById('slidesTrack');
+    const dots  = document.getElementById('slideDots');
+    const gradients = [
+      'linear-gradient(135deg,#1a0533,#6a1faa)',
+      'linear-gradient(135deg,#0a1a3a,#1a4a8a)',
+      'linear-gradient(135deg,#003322,#1a6644)',
+      'linear-gradient(135deg,#2a0a0a,#8a2020)',
+      'linear-gradient(135deg,#1a1a00,#6a6a00)',
+      'linear-gradient(135deg,#001a2a,#005566)',
+    ];
+
+    track.innerHTML = slideEvents.map((e, i) => {
+      const dateStr = e.date ? new Date(e.date).toLocaleDateString('en-KE',
+        { weekday:'short', day:'numeric', month:'short', year:'numeric' }) : '';
+      const bg = e.image_url
+        ? `url('${e.image_url.replace(/w=\d+/, 'w=1600')}')`
+        : gradients[i % gradients.length];
+      return `
+        <div class="slide ${i === 0 ? 'active' : ''}" id="slide-${i}">
+          <div class="slide-bg" style="background-image:${bg};background-color:#111"></div>
+          <div class="slide-overlay"></div>
+          <div class="slide-content">
+            <div class="slide-cat">${e.category || 'Event'}</div>
+            <div class="slide-title">${e.title}</div>
+            <div class="slide-meta">
+              ${dateStr ? `<span>📅 ${dateStr}</span>` : ''}
+              <span>📍 ${e.venue}${e.city ? ', ' + e.city : ''}</span>
+            </div>
+            <div class="slide-actions">
+              <button class="slide-btn-primary" onclick="openEventPage('${e.id}')">Get Tickets</button>
+              <button class="slide-btn-ghost" onclick="openEventPage('${e.id}')">View Details</button>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+    dots.innerHTML = slideEvents.map((_, i) =>
+      `<div class="slide-dot ${i === 0 ? 'active' : ''}" onclick="goToSlide(${i})"></div>`
+    ).join('');
+
+    document.getElementById('heroSkeleton').style.display = 'none';
+    document.getElementById('slidePrev').style.display    = 'flex';
+    document.getElementById('slideNext').style.display    = 'flex';
+    updateSlideCounter();
+    startSlideTimer();
+  }
+
+  function goToSlide(n) {
+    const slides = document.querySelectorAll('.slide');
+    const dots   = document.querySelectorAll('.slide-dot');
+    if (!slides.length) return;
+    slides[slideIndex].classList.remove('active');
+    dots[slideIndex] && dots[slideIndex].classList.remove('active');
+    slideIndex = ((n % slideTotal) + slideTotal) % slideTotal;
+    slides[slideIndex].classList.add('active');
+    dots[slideIndex] && dots[slideIndex].classList.add('active');
+    document.getElementById('slidesTrack').style.transform = `translateX(-${slideIndex * 100}%)`;
+    updateSlideCounter();
+    resetSlideTimer();
+  }
+
+  function slideMove(dir) { goToSlide(slideIndex + dir); }
+
+  function updateSlideCounter() {
+    const el = document.getElementById('slideCounter');
+    if (el) el.textContent = `${slideIndex + 1} / ${slideTotal}`;
+  }
+
+  function startSlideTimer() {
+    slideTimer = setInterval(() => goToSlide(slideIndex + 1), 5000);
+  }
+
+  function resetSlideTimer() {
+    clearInterval(slideTimer);
+    startSlideTimer();
+  }
+
+  // Pause on hover
+  document.getElementById('home') && document.getElementById('home').addEventListener('mouseenter', () => clearInterval(slideTimer));
+  document.getElementById('home') && document.getElementById('home').addEventListener('mouseleave', () => startSlideTimer());
   async function loadEvents() {
     document.getElementById('eventsGrid').innerHTML =
       '<p style="color:var(--muted);grid-column:1/-1;text-align:center;padding:40px">Loading events…</p>';
@@ -1579,6 +1884,7 @@ img, video, canvas {
 
     console.log('✅ Events loaded:', data.length, 'events');
     allEvents = data;
+    buildSlideshow(data);
     renderEvents('all');
     loadFeaturedEvent();
     renderVenues(data);
