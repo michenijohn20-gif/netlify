@@ -162,6 +162,77 @@ img, video, canvas {
     .stat-label { font-size: 0.75rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
 
     @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+    @keyframes floatBadge { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+    @keyframes cardIn { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:none} }
+
+    /* Staggered card animations */
+    .event-card { animation: cardIn 0.5s ease both; }
+    .event-card:nth-child(1){animation-delay:0.05s}
+    .event-card:nth-child(2){animation-delay:0.1s}
+    .event-card:nth-child(3){animation-delay:0.15s}
+    .event-card:nth-child(4){animation-delay:0.2s}
+    .event-card:nth-child(5){animation-delay:0.25s}
+    .event-card:nth-child(6){animation-delay:0.3s}
+
+    /* Pulse on live badge */
+    .hero-tag::before { animation: floatBadge 2s ease infinite; }
+
+    /* Venue card hover glow */
+    .venue-card { transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s; }
+    .venue-card:hover { transform: translateY(-6px); border-color: rgba(232,201,109,0.4); box-shadow: 0 12px 32px rgba(232,201,109,0.08); }
+
+    /* Search bar focus glow */
+    .search-bar:focus-within { border-color: rgba(232,201,109,0.3); box-shadow: 0 0 0 3px rgba(232,201,109,0.06), 0 24px 64px rgba(0,0,0,0.5); }
+
+    /* Cat pill transition */
+    .cat-pill { transition: all 0.18s cubic-bezier(0.4,0,0.2,1); }
+
+    /* ── EVENT DETAIL PAGE ── */
+    .event-page { position:fixed; inset:0; z-index:280; background:var(--black); overflow-y:auto; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+    .event-page.open { opacity:1; pointer-events:all; }
+    .event-page-hero {
+      min-height: 55vh; position:relative; display:flex; align-items:flex-end;
+      padding: 0 48px 48px;
+    }
+    .event-page-hero-bg { position:absolute; inset:0; background-size:cover; background-position:center; }
+    .event-page-hero-bg::after { content:''; position:absolute; inset:0; background:linear-gradient(to top, var(--black) 0%, rgba(10,10,10,0.6) 60%, rgba(10,10,10,0.2) 100%); }
+    .event-page-back { position:absolute; top:24px; left:48px; background:rgba(0,0,0,0.5); backdrop-filter:blur(8px); border:1px solid var(--border); color:var(--white); padding:8px 18px; border-radius:6px; font-family:var(--font-body); font-size:0.85rem; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px; z-index:2; }
+    .event-page-back:hover { background:rgba(255,255,255,0.1); }
+    .event-page-hero-content { position:relative; z-index:2; max-width:800px; }
+    .event-page-category { font-size:0.7rem; letter-spacing:2px; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:12px; }
+    .event-page-title { font-family:var(--font-display); font-size:clamp(2.2rem,5vw,4rem); font-weight:900; letter-spacing:-2px; line-height:1; margin-bottom:16px; }
+    .event-page-tagline { color:var(--muted); font-size:1rem; max-width:560px; }
+    .event-page-body { max-width:1100px; margin:0 auto; padding:48px; display:grid; grid-template-columns:1fr 380px; gap:40px; }
+    .event-page-info { }
+    .ep-section-title { font-family:var(--font-display); font-size:1.2rem; font-weight:700; margin-bottom:16px; letter-spacing:-0.3px; }
+    .ep-description { color:var(--muted); line-height:1.8; font-size:0.95rem; margin-bottom:36px; }
+    .ep-details-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:36px; }
+    .ep-detail-item { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:16px 18px; }
+    .ep-detail-label { font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:var(--muted); font-weight:600; margin-bottom:4px; }
+    .ep-detail-val { font-weight:600; font-size:0.95rem; }
+    .event-page-sidebar { position:sticky; top:24px; }
+    .ep-ticket-box { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:28px; }
+    .ep-ticket-title { font-family:var(--font-display); font-size:1.1rem; font-weight:700; margin-bottom:20px; }
+    .ep-ticket-type { border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin-bottom:10px; cursor:pointer; transition:all 0.2s; display:flex; justify-content:space-between; align-items:center; }
+    .ep-ticket-type:hover,.ep-ticket-type.selected { border-color:var(--gold); background:rgba(232,201,109,0.05); }
+    .ep-tt-name { font-weight:600; font-size:0.9rem; }
+    .ep-tt-desc { font-size:0.76rem; color:var(--muted); margin-top:2px; }
+    .ep-tt-price { font-family:var(--font-display); font-size:1.1rem; font-weight:700; color:var(--gold); }
+    .ep-tt-avail { font-size:0.72rem; color:var(--muted); text-align:right; margin-top:2px; }
+    .ep-qty-row { display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-top:1px solid var(--border); margin-top:4px; }
+    .ep-total { display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-top:1px solid var(--border); font-weight:700; }
+    .ep-total-val { font-family:var(--font-display); font-size:1.3rem; color:var(--gold); }
+    .ep-buy-btn { width:100%; background:var(--gold); color:var(--black); border:none; border-radius:8px; padding:15px; font-family:var(--font-body); font-size:1rem; font-weight:700; cursor:pointer; margin-top:14px; transition:transform 0.2s, box-shadow 0.2s; }
+    .ep-buy-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(232,201,109,0.3); }
+    .ep-loading { text-align:center; color:var(--muted); padding:40px 0; }
+    @media(max-width:900px){
+      .event-page-hero { padding:0 20px 36px; min-height:45vh; }
+      .event-page-back { left:20px; }
+      .event-page-body { grid-template-columns:1fr; padding:24px 20px; }
+      .event-page-sidebar { position:static; }
+    }
 
     /* ── SEARCH BAR ── */
     .search-section {
@@ -879,9 +950,9 @@ img, video, canvas {
     </div>
     <div class="footer-col">
       <h4>Account</h4>
-      <ul>
-        <li><a href="#" onclick="openAuthModal(event)">Sign In</a></li>
-        <li><a href="#" onclick="switchTab('signup');openAuthModal(event)">Register</a></li>
+      <ul id="footerAccountLinks">
+        <li id="footerSignIn"><a href="#" onclick="openAuthModal(event)">Sign In</a></li>
+        <li id="footerRegister"><a href="#" onclick="switchTab('signup');openAuthModal(event)">Register</a></li>
         <li><a href="#" onclick="openPanel('tickets')">My Tickets</a></li>
         <li><a href="#" onclick="openPanel('tickets')">Order History</a></li>
         <li><a href="#" onclick="openPanel('wishlist')">Saved Events</a></li>
@@ -1114,6 +1185,8 @@ img, video, canvas {
   function updateNavbar() {
     const signInEl = document.getElementById('navSignIn');
     const userEl   = document.getElementById('navUser');
+    const footerSignIn   = document.getElementById('footerSignIn');
+    const footerRegister = document.getElementById('footerRegister');
     if (currentUser) {
       signInEl.style.display = 'none';
       userEl.style.display   = 'block';
@@ -1121,7 +1194,10 @@ img, video, canvas {
       const label = name.split(' ')[0];
       document.getElementById('userName').textContent   = label.split('@')[0];
       document.getElementById('userAvatar').textContent = label[0].toUpperCase();
-      // Check if user is admin and show admin link
+      // Hide sign in / register in footer when logged in
+      if (footerSignIn)   footerSignIn.style.display   = 'none';
+      if (footerRegister) footerRegister.style.display = 'none';
+      // Check if admin
       supabaseClient.from('profiles').select('is_organizer').eq('id', currentUser.id).single()
         .then(({ data }) => {
           const adminLink = document.getElementById('adminLink');
@@ -1130,6 +1206,8 @@ img, video, canvas {
     } else {
       signInEl.style.display = 'block';
       userEl.style.display   = 'none';
+      if (footerSignIn)   footerSignIn.style.display   = 'block';
+      if (footerRegister) footerRegister.style.display = 'block';
       const adminLink = document.getElementById('adminLink');
       if (adminLink) adminLink.style.display = 'none';
     }
@@ -1344,9 +1422,17 @@ img, video, canvas {
   // ── VENUES (dynamic from events data) ────────────────────────────
   function renderVenues(events) {
     const today = new Date(); today.setHours(0,0,0,0);
-    // Count upcoming events per venue
     const venueCounts = {};
     const venueCity   = {};
+
+    // Populate unique cities into search dropdown
+    const cities = [...new Set(events.map(e => e.city).filter(Boolean))].sort();
+    const citySelect = document.getElementById('searchCity');
+    if (citySelect) {
+      citySelect.innerHTML = '<option value="">All Cities</option>' +
+        cities.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+
     events.forEach(e => {
       if (!e.venue) return;
       const eDate = e.date ? new Date(e.date) : null;
@@ -1356,7 +1442,6 @@ img, video, canvas {
       }
     });
 
-    // Sort by event count descending, take top 4
     const venueIcons = { 'stadium':'🏟', 'gardens':'🌿', 'arena':'🎪', 'theatre':'🏛',
       'theater':'🏛', 'bar':'🍻', 'park':'🌳', 'ground':'⚽', 'kicc':'🏢',
       'carnivore':'🥩', 'alchemist':'🍻', 'beach':'🌊', 'centre':'🎨', 'center':'🎨' };
@@ -1369,10 +1454,8 @@ img, video, canvas {
       return '📍';
     }
 
-    const sorted = Object.entries(venueCounts)
-      .sort((a, b) => b[1] - a[1]).slice(0, 4);
-
-    const grid = document.getElementById('venuesGrid');
+    const sorted = Object.entries(venueCounts).sort((a, b) => b[1] - a[1]).slice(0, 4);
+    const grid   = document.getElementById('venuesGrid');
     if (sorted.length === 0) {
       grid.innerHTML = '<div style="color:var(--muted);text-align:center;grid-column:1/-1;padding:20px">No upcoming events at venues yet.</div>';
       return;
@@ -1477,7 +1560,7 @@ img, video, canvas {
       const imgBg   = gradients[i % gradients.length];
       const dateStr = e.date ? new Date(e.date).toLocaleDateString('en-KE', { day:'numeric', month:'short', year:'numeric' }) : '';
       return `
-        <div class="event-card">
+        <div class="event-card" onclick="openEventPage('${e.id}')">
           <div class="card-img-wrap">
             ${e.image_url
               ? `<img src="${e.image_url}" alt="${e.title}" onerror="this.parentElement.style.background='${imgBg}';this.remove()"/>`
@@ -1489,23 +1572,61 @@ img, video, canvas {
           <div class="card-body">
             <div class="card-meta">
               <span class="card-date">📅 ${dateStr}</span>
-              <span class="card-avail">✓ Available</span>
+              <span class="card-avail" id="avail-${e.id}">✓ Available</span>
             </div>
             <div class="card-title">${e.title}</div>
             <div class="card-venue">📍 ${e.venue}${e.city ? ', ' + e.city : ''}</div>
             <div class="card-footer">
-              <div class="card-price">From <strong>KES —</strong></div>
-              <button class="card-btn"
-                onclick="handleGetTickets('${e.id}','${e.title.replace(/'/g,"\\'")}','${dateStr}','${e.venue.replace(/'/g,"\\'")}')">
-                Get Tickets
+              <div class="card-price">From <strong id="price-${e.id}">KES —</strong></div>
+              <button class="card-btn" onclick="event.stopPropagation();openEventPage('${e.id}')">
+                View & Buy
               </button>
             </div>
           </div>
         </div>`;
     }).join('');
+    loadCardPrices(filtered);
   }
 
-  // ── FILTER BY CATEGORY ────────────────────────────────────────────
+  // Load real minimum prices for event cards from ticket_types
+  async function loadCardPrices(events) {
+    if (!events || events.length === 0) return;
+    const ids = events.map(e => e.id);
+    const { data } = await supabaseClient
+      .from('ticket_types')
+      .select('event_id, price, quantity_total, quantity_sold')
+      .in('event_id', ids);
+    if (!data) return;
+    // Group by event_id
+    const byEvent = {};
+    data.forEach(t => {
+      if (!byEvent[t.event_id]) byEvent[t.event_id] = [];
+      byEvent[t.event_id].push(t);
+    });
+    ids.forEach(id => {
+      const types = byEvent[id];
+      const priceEl = document.getElementById('price-' + id);
+      const availEl = document.getElementById('avail-' + id);
+      if (!priceEl) return;
+      if (!types || types.length === 0) {
+        priceEl.textContent = '—';
+        return;
+      }
+      const minPrice = Math.min(...types.map(t => t.price));
+      priceEl.textContent = 'KES ' + Number(minPrice).toLocaleString();
+      // Check if all sold out
+      const allSoldOut = types.every(t => (t.quantity_sold || 0) >= t.quantity_total);
+      const anyLow     = types.some(t => {
+        const rem = t.quantity_total - (t.quantity_sold || 0);
+        return rem > 0 && rem <= 10;
+      });
+      if (availEl) {
+        if (allSoldOut) { availEl.textContent = '✕ Sold Out'; availEl.className = 'card-avail sold'; }
+        else if (anyLow) { availEl.textContent = '⚠ Low Stock'; availEl.className = 'card-avail low'; }
+        else { availEl.textContent = '✓ Available'; availEl.className = 'card-avail'; }
+      }
+    });
+  }
   function filterCat(btn, cat) {
     document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
     btn.classList.add('active');
@@ -1953,6 +2074,165 @@ img, video, canvas {
   supabaseClient.auth.onAuthStateChange((event, session) => {
     if (session?.user) loadWishlistIds();
   });
+
+  // ── EVENT DETAIL PAGE ─────────────────────────────────────────────
+  let epQty = 1;
+  let epSelectedPrice = 0;
+  let epSelectedTicketId = null;
+  let epCurrentEventId = null;
+  let epCurrentEventTitle = null;
+
+  async function openEventPage(eventId) {
+    const page = document.getElementById('eventPage');
+    page.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    page.scrollTop = 0;
+
+    // Reset ticket state
+    epQty = 1; epSelectedPrice = 0; epSelectedTicketId = null;
+    document.getElementById('epQtyNum').textContent = '1';
+    document.getElementById('epTotal').textContent = 'KES —';
+    document.getElementById('epTicketTypes').innerHTML = '<div class="ep-loading">Loading tickets…</div>';
+
+    // Load event
+    const { data: e, error } = await supabaseClient
+      .from('events').select('*').eq('id', eventId).single();
+
+    if (error || !e) {
+      document.getElementById('epTitle').textContent = 'Event not found';
+      return;
+    }
+
+    epCurrentEventId    = e.id;
+    epCurrentEventTitle = e.title;
+
+    // Hero
+    const heroBg = document.getElementById('epHeroBg');
+    heroBg.style.backgroundImage = e.image_url ? `url('${e.image_url}')` : 'linear-gradient(135deg,#1a0533,#6a1faa)';
+    document.getElementById('epCategory').textContent = (e.category || '').toUpperCase();
+    document.getElementById('epTitle').textContent    = e.title;
+    document.getElementById('epTagline').textContent  = e.description ? e.description.substring(0, 120) + (e.description.length > 120 ? '…' : '') : '';
+
+    // Description
+    document.getElementById('epDescription').textContent = e.description || 'No description available.';
+
+    // Details grid
+    const dateStr = e.date ? new Date(e.date).toLocaleDateString('en-KE', { weekday:'long', day:'numeric', month:'long', year:'numeric' }) : '—';
+    const endDateStr = e.end_date && e.end_date !== e.date ? new Date(e.end_date).toLocaleDateString('en-KE', { day:'numeric', month:'long', year:'numeric' }) : null;
+    document.getElementById('epDetailsGrid').innerHTML = `
+      <div class="ep-detail-item"><div class="ep-detail-label">Date</div><div class="ep-detail-val">${dateStr}</div></div>
+      ${endDateStr ? `<div class="ep-detail-item"><div class="ep-detail-label">End Date</div><div class="ep-detail-val">${endDateStr}</div></div>` : ''}
+      ${e.time ? `<div class="ep-detail-item"><div class="ep-detail-label">Time</div><div class="ep-detail-val">${e.time}</div></div>` : ''}
+      <div class="ep-detail-item"><div class="ep-detail-label">Venue</div><div class="ep-detail-val">${e.venue || '—'}</div></div>
+      <div class="ep-detail-item"><div class="ep-detail-label">City</div><div class="ep-detail-val">${e.city || '—'}</div></div>
+      <div class="ep-detail-item"><div class="ep-detail-label">Category</div><div class="ep-detail-val" style="text-transform:capitalize">${e.category || '—'}</div></div>`;
+
+    // Ticket types
+    const { data: types } = await supabaseClient
+      .from('ticket_types').select('*')
+      .eq('event_id', eventId).order('price', { ascending: true });
+
+    if (!types || types.length === 0) {
+      document.getElementById('epTicketTypes').innerHTML =
+        '<div class="ep-loading">No tickets set up yet.</div>';
+      return;
+    }
+
+    document.getElementById('epTicketTypes').innerHTML = types.map((t, i) => {
+      const remaining = t.quantity_total - (t.quantity_sold || 0);
+      const isSoldOut = remaining <= 0;
+      const isLow     = !isSoldOut && remaining <= 10;
+      const availColor = isSoldOut ? 'var(--red)' : isLow ? '#e8a84d' : 'var(--muted)';
+      const availText  = isSoldOut ? 'Sold out' : isLow ? `${remaining} left!` : `${remaining} available`;
+      return `
+        <div class="ep-ticket-type ${i === 0 && !isSoldOut ? 'selected' : ''} ${isSoldOut ? '' : ''}"
+             onclick="${isSoldOut ? '' : `epSelectTicket(this,${t.price},'${t.id}')`}"
+             style="${isSoldOut ? 'opacity:0.5;cursor:not-allowed' : ''}">
+          <div>
+            <div class="ep-tt-name">${t.name}</div>
+            <div class="ep-tt-desc">${t.description || ''}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div class="ep-tt-price">KES ${Number(t.price).toLocaleString()}</div>
+            <div class="ep-tt-avail" style="color:${availColor}">${availText}</div>
+          </div>
+        </div>`;
+    }).join('');
+
+    // Auto-select first available
+    const first = types.find(t => (t.quantity_total - (t.quantity_sold || 0)) > 0);
+    if (first) { epSelectedPrice = first.price; epSelectedTicketId = first.id; epUpdateTotal(); }
+  }
+
+  function closeEventPage() {
+    document.getElementById('eventPage').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function epSelectTicket(el, price, tid) {
+    document.querySelectorAll('.ep-ticket-type').forEach(t => t.classList.remove('selected'));
+    el.classList.add('selected');
+    epSelectedPrice = price; epSelectedTicketId = tid;
+    epUpdateTotal();
+  }
+
+  function epChangeQty(d) {
+    epQty = Math.max(1, Math.min(10, epQty + d));
+    document.getElementById('epQtyNum').textContent = epQty;
+    epUpdateTotal();
+  }
+
+  function epUpdateTotal() {
+    if (!epSelectedPrice) { document.getElementById('epTotal').textContent = 'KES —'; return; }
+    const fee   = Math.round(epSelectedPrice * 0.1);
+    const total = (Number(epSelectedPrice) + fee) * epQty;
+    document.getElementById('epTotal').textContent = 'KES ' + total.toLocaleString();
+  }
+
+  function epCheckout() {
+    if (!currentUser) { closeEventPage(); openAuthModal(null); showAuthError('Please sign in to purchase tickets.'); return; }
+    if (!epSelectedPrice) { showToast('Please select a ticket type.', 'var(--red)'); return; }
+
+    const fee      = Math.round(epSelectedPrice * 0.1);
+    const total    = (Number(epSelectedPrice) + fee) * epQty;
+    const txRef    = 'TV-' + Date.now() + '-' + Math.random().toString(36).substr(2,6).toUpperCase();
+    const snapQty  = epQty;
+    const snapId   = epCurrentEventId;
+    const snapName = epCurrentEventTitle;
+    const snapTid  = epSelectedTicketId;
+
+    function paystackCallback(response) {
+      showToast('Processing your booking…', 'var(--gold)');
+      supabaseClient.from('bookings').insert({
+        user_id: currentUser.id, event_id: snapId || null,
+        ticket_type_id: snapTid || null, quantity: snapQty,
+        total_amount: total, status: 'confirmed',
+        qr_code: 'QR-' + response.reference,
+      }).then(function(result) {
+        if (result.error) {
+          showToast('Payment received but booking failed. Contact support.', 'var(--red)');
+        } else {
+          if (snapTid) {
+            supabaseClient.from('ticket_types').select('quantity_sold').eq('id', snapTid).single()
+              .then(r => { if (r.data) supabaseClient.from('ticket_types').update({ quantity_sold: (r.data.quantity_sold||0)+snapQty }).eq('id', snapTid); });
+          }
+          closeEventPage();
+          showToast('🎉 Tickets confirmed! Check My Tickets.', 'var(--green)');
+        }
+      });
+    }
+    function paystackOnClose() { showToast('Payment cancelled.', 'var(--muted)'); }
+
+    setTimeout(function() {
+      var handler = PaystackPop.setup({
+        key: 'pk_test_0c48c322ad3293e3d966e1329b0f6b35710dfea6',
+        email: currentUser.email, amount: total * 100, currency: 'KES', ref: txRef,
+        label: snapName || 'Event Ticket',
+        callback: paystackCallback, onClose: paystackOnClose
+      });
+      handler.openIframe();
+    }, 300);
+  }
 
   // ── ADMIN DASHBOARD ───────────────────────────────────────────────
   function openAdmin() {
@@ -2412,6 +2692,47 @@ img, video, canvas {
       </div>
       <button class="admin-save-btn" style="margin-top:14px" onclick="addTicketType()">＋ Add Ticket Type</button>
       <p id="tmgrMsg" style="font-size:0.82rem;margin-top:10px;min-height:18px;text-align:center"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── EVENT DETAIL PAGE ── -->
+<div class="event-page" id="eventPage">
+  <div class="event-page-hero" id="epHero">
+    <div class="event-page-hero-bg" id="epHeroBg"></div>
+    <button class="event-page-back" onclick="closeEventPage()">← Back to Events</button>
+    <div class="event-page-hero-content">
+      <div class="event-page-category" id="epCategory"></div>
+      <div class="event-page-title" id="epTitle">Loading…</div>
+      <div class="event-page-tagline" id="epTagline"></div>
+    </div>
+  </div>
+  <div class="event-page-body">
+    <div class="event-page-info">
+      <p class="ep-section-title">About This Event</p>
+      <p class="ep-description" id="epDescription">Loading event details…</p>
+      <p class="ep-section-title">Event Details</p>
+      <div class="ep-details-grid" id="epDetailsGrid"></div>
+    </div>
+    <div class="event-page-sidebar">
+      <div class="ep-ticket-box">
+        <div class="ep-ticket-title">🎟 Select Tickets</div>
+        <div id="epTicketTypes"><div class="ep-loading">Loading tickets…</div></div>
+        <div class="ep-qty-row">
+          <span style="font-weight:500">Quantity</span>
+          <div style="display:flex;align-items:center;gap:14px">
+            <button class="qty-btn" onclick="epChangeQty(-1)">−</button>
+            <span class="qty-num" id="epQtyNum">1</span>
+            <button class="qty-btn" onclick="epChangeQty(1)">+</button>
+          </div>
+        </div>
+        <div class="ep-total">
+          <span>Total</span>
+          <span class="ep-total-val" id="epTotal">KES —</span>
+        </div>
+        <button class="ep-buy-btn" id="epBuyBtn" onclick="epCheckout()">Proceed to Checkout →</button>
+        <p style="text-align:center;color:var(--muted);font-size:0.75rem;margin-top:12px">🔒 Secure checkout · Instant e-ticket delivery</p>
+      </div>
     </div>
   </div>
 </div>
