@@ -1342,6 +1342,22 @@ img, video, canvas {
         </div>
         <button class="profile-save" id="profileSaveBtn" onclick="saveProfile()">Save Changes</button>
         <p class="profile-msg" id="profileMsg"></p>
+
+        <div class="profile-section-title">Change Password</div>
+        <div class="profile-field">
+          <label>Current Password</label>
+          <input type="password" id="cpCurrent" placeholder="Your current password"/>
+        </div>
+        <div class="profile-field">
+          <label>New Password</label>
+          <input type="password" id="cpNew" placeholder="Min 6 characters"/>
+        </div>
+        <div class="profile-field">
+          <label>Confirm New Password</label>
+          <input type="password" id="cpConfirm" placeholder="Repeat new password"/>
+        </div>
+        <button class="profile-save" id="cpSaveBtn" onclick="changePassword()" style="background:var(--deep);border:1px solid var(--border);color:var(--white)">Update Password</button>
+        <p class="profile-msg" id="cpMsg"></p>
       </div>
     </div>
 
@@ -1593,15 +1609,25 @@ img, video, canvas {
     btn.disabled = true; btn.textContent = 'Sending…';
     clearAuthMessages();
 
+    // redirectTo must exactly match a URL in Supabase → Authentication → URL Configuration → Redirect URLs
+    const redirectTo = window.location.href.split('#')[0].split('?')[0];
+
     const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + window.location.pathname
+      redirectTo: redirectTo
     });
 
     btn.disabled = false; btn.textContent = 'Send Reset Link';
 
-    if (error) { showAuthError(error.message); return; }
+    if (error) {
+      if (error.message.toLowerCase().includes('rate limit') || error.message.includes('429')) {
+        showAuthError('Too many emails sent. Please wait an hour before trying again, or change your password from your Profile once signed in.');
+      } else {
+        showAuthError(error.message);
+      }
+      return;
+    }
 
-    showAuthSuccess('✅ Reset link sent! Check your email inbox (and spam folder).');
+    showAuthSuccess('✅ Reset link sent to ' + email + '! Check your inbox and spam folder. The link expires in 1 hour.');
     document.getElementById('fpEmail').value = '';
   }
 
@@ -2516,6 +2542,64 @@ img, video, canvas {
       document.getElementById('profileAvatarBig').textContent = (name[0] || currentUser.email[0]).toUpperCase();
       setTimeout(() => msg.textContent = '', 3000);
     }
+  }
+
+  // ── CHANGE PASSWORD (logged-in users — no email needed) ──────────
+  async function changePassword() {
+    const current = document.getElementById('cpCurrent').value;
+    const newPwd  = document.getElementById('cpNew').value;
+    const confirm = document.getElementById('cpConfirm').value;
+    const btn     = document.getElementById('cpSaveBtn');
+    const msg     = document.getElementById('cpMsg');
+
+    msg.textContent = ''; msg.style.color = 'var(--muted)';
+
+    if (!current || !newPwd || !confirm) {
+      msg.textContent = '⚠️ Please fill in all three fields.';
+      msg.style.color = 'var(--red)'; return;
+    }
+    if (newPwd.length < 6) {
+      msg.textContent = '⚠️ New password must be at least 6 characters.';
+      msg.style.color = 'var(--red)'; return;
+    }
+    if (newPwd !== confirm) {
+      msg.textContent = '⚠️ New passwords do not match.';
+      msg.style.color = 'var(--red)'; return;
+    }
+
+    btn.disabled = true; btn.textContent = 'Updating…';
+
+    // Step 1 — Re-authenticate with current password to verify it is correct
+    const { error: reAuthErr } = await supabaseClient.auth.signInWithPassword({
+      email: currentUser.email,
+      password: current
+    });
+
+    if (reAuthErr) {
+      btn.disabled = false; btn.textContent = 'Update Password';
+      msg.textContent = '❌ Current password is incorrect.';
+      msg.style.color = 'var(--red)'; return;
+    }
+
+    // Step 2 — Update to new password in Supabase Auth
+    const { error: updateErr } = await supabaseClient.auth.updateUser({
+      password: newPwd
+    });
+
+    btn.disabled = false; btn.textContent = 'Update Password';
+
+    if (updateErr) {
+      msg.textContent = '❌ ' + updateErr.message;
+      msg.style.color = 'var(--red)'; return;
+    }
+
+    // Step 3 — Clear fields and show success
+    document.getElementById('cpCurrent').value = '';
+    document.getElementById('cpNew').value     = '';
+    document.getElementById('cpConfirm').value = '';
+    msg.textContent = '✅ Password updated successfully!';
+    msg.style.color = 'var(--green)';
+    setTimeout(() => msg.textContent = '', 4000);
   }
 
   // ── TOAST ─────────────────────────────────────────────────────────
