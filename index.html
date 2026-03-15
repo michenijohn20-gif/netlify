@@ -196,8 +196,8 @@ img, video, canvas {
       min-height: 55vh; position:relative; display:flex; align-items:flex-end;
       padding: 0 48px 48px;
     }
-    .event-page-hero-bg { position:absolute; inset:0; background-size:cover; background-position:center; }
-    .event-page-hero-bg::after { content:''; position:absolute; inset:0; background:linear-gradient(to top, var(--black) 0%, rgba(10,10,10,0.6) 60%, rgba(10,10,10,0.2) 100%); }
+    .event-page-hero-bg { position:absolute; inset:0; background-size:cover; background-position:center top; image-rendering:high-quality; }
+    .event-page-hero-bg::after { content:''; position:absolute; inset:0; background:linear-gradient(to top, var(--black) 0%, rgba(10,10,10,0.5) 55%, rgba(10,10,10,0.15) 100%); }
     .event-page-back { position:absolute; top:24px; left:48px; background:rgba(0,0,0,0.5); backdrop-filter:blur(8px); border:1px solid var(--border); color:var(--white); padding:8px 18px; border-radius:6px; font-family:var(--font-body); font-size:0.85rem; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px; z-index:2; }
     .event-page-back:hover { background:rgba(255,255,255,0.1); }
     .event-page-hero-content { position:relative; z-index:2; max-width:800px; }
@@ -756,6 +756,60 @@ img, video, canvas {
     .admin-confirm-btns { display:flex; gap:10px; justify-content:center; }
     .admin-confirm-yes { background:var(--red); color:white; border:none; padding:10px 24px; border-radius:6px; font-family:var(--font-body); font-weight:600; cursor:pointer; }
     .admin-confirm-no  { background:none; border:1px solid var(--border); color:var(--white); padding:10px 24px; border-radius:6px; font-family:var(--font-body); cursor:pointer; }
+    /* ── THEME TOGGLE ── */
+    .theme-toggle {
+      width: 48px; height: 26px; border-radius: 13px;
+      background: var(--card); border: 1px solid var(--border);
+      cursor: pointer; position: relative; transition: background 0.3s, border-color 0.3s;
+      flex-shrink: 0; display: flex; align-items: center; padding: 3px;
+    }
+    .theme-toggle-knob {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--gold); position: absolute; left: 3px;
+      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), background 0.3s;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; line-height: 1;
+    }
+    body.light-mode .theme-toggle { background: #e0ddd5; border-color: rgba(0,0,0,0.12); }
+    body.light-mode .theme-toggle-knob { transform: translateX(22px); background: #f5a623; }
+
+    /* ── LIGHT MODE OVERRIDES ── */
+    body.light-mode {
+      --black: #f5f3ee;
+      --deep: #ece9e2;
+      --card: #ffffff;
+      --border: rgba(0,0,0,0.09);
+      --white: #1a1a1a;
+      --muted: #6b6b7a;
+      --gold: #b8860b;
+      background: #f5f3ee;
+      color: #1a1a1a;
+    }
+    body.light-mode nav {
+      background: linear-gradient(to bottom, rgba(245,243,238,0.97), transparent);
+    }
+    body.light-mode .hero-bg {
+      background:
+        radial-gradient(ellipse 80% 60% at 60% 40%, rgba(184,134,11,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 50% at 20% 80%, rgba(78,203,113,0.05) 0%, transparent 60%),
+        linear-gradient(160deg, #f5f3ee 0%, #ece9e2 50%, #e8e5dc 100%);
+    }
+    body.light-mode .hero-grid {
+      background-image:
+        linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+    }
+    body.light-mode body::before { opacity: 0.15; }
+    body.light-mode .search-bar,
+    body.light-mode .event-card,
+    body.light-mode .modal,
+    body.light-mode .auth-box,
+    body.light-mode .panel,
+    body.light-mode .admin-form-box { box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+    body.light-mode .featured-img::after {
+      background: linear-gradient(90deg, transparent 60%, #ffffff 100%);
+    }
+    body.light-mode footer { background: #ece9e2; }
   </style>
 </head>
 <body>
@@ -767,7 +821,13 @@ img, video, canvas {
     <li><a href="#events">Events</a></li>
     <li><a href="#venues">Venues</a></li>
     <li><a href="#">Artists</a></li>
-    <li><a href="#">My Tickets</a></li>
+    <li><a href="#" onclick="openPanel('tickets')">My Tickets</a></li>
+    <!-- Theme toggle -->
+    <li>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode">
+        <div class="theme-toggle-knob" id="themeKnob">🌙</div>
+      </button>
+    </li>
     <!-- Logged OUT: show Sign In button -->
     <li id="navSignIn"><a href="#" class="nav-cta" onclick="openAuthModal(event)">Sign In</a></li>
     <!-- Logged IN: show user menu (hidden by default) -->
@@ -799,7 +859,6 @@ img, video, canvas {
   <p class="hero-sub">Discover the world's most electrifying concerts, festivals, sports, and theatre. Your next unforgettable night starts here.</p>
   <div class="hero-actions">
     <a href="#events" class="btn-primary">Browse Events</a>
-    <a href="#" class="btn-ghost">▶ Watch Highlights</a>
   </div>
   <div class="hero-stats">
     <div>
@@ -914,7 +973,7 @@ img, video, canvas {
   <div class="section-label">📍 Top Spots</div>
   <div class="section-header">
     <div class="section-title">Iconic Venues</div>
-    <a href="#" class="view-all">Explore All →</a>
+    <a href="#venues" class="view-all">Explore All →</a>
   </div>
   <div class="venues-grid" id="venuesGrid">
     <div style="color:var(--muted);text-align:center;grid-column:1/-1;padding:20px">Loading venues…</div>
@@ -2087,6 +2146,8 @@ img, video, canvas {
     page.classList.add('open');
     document.body.style.overflow = 'hidden';
     page.scrollTop = 0;
+    // Push history state so browser back button works
+    history.pushState({ page: 'event', eventId }, '', '#event-' + eventId);
 
     // Reset ticket state
     epQty = 1; epSelectedPrice = 0; epSelectedTicketId = null;
@@ -2106,9 +2167,10 @@ img, video, canvas {
     epCurrentEventId    = e.id;
     epCurrentEventTitle = e.title;
 
-    // Hero
+    // Hero — request higher resolution image
     const heroBg = document.getElementById('epHeroBg');
-    heroBg.style.backgroundImage = e.image_url ? `url('${e.image_url}')` : 'linear-gradient(135deg,#1a0533,#6a1faa)';
+    const imgUrl = e.image_url ? e.image_url.replace(/w=\d+/, 'w=1600').replace(/q=\d+/, 'q=90') : null;
+    heroBg.style.backgroundImage = imgUrl ? `url('${imgUrl}')` : 'linear-gradient(135deg,#1a0533,#6a1faa)';
     document.getElementById('epCategory').textContent = (e.category || '').toUpperCase();
     document.getElementById('epTitle').textContent    = e.title;
     document.getElementById('epTagline').textContent  = e.description ? e.description.substring(0, 120) + (e.description.length > 120 ? '…' : '') : '';
@@ -2167,7 +2229,37 @@ img, video, canvas {
   function closeEventPage() {
     document.getElementById('eventPage').classList.remove('open');
     document.body.style.overflow = '';
+    // Only go back in history if we pushed a state
+    if (history.state && history.state.page === 'event') {
+      history.back();
+    }
   }
+
+  function closeAdmin() {
+    document.getElementById('adminOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    if (history.state && history.state.page === 'admin') {
+      history.back();
+    }
+  }
+
+  // Handle browser back/forward buttons
+  window.addEventListener('popstate', function(e) {
+    // Close event page if open
+    const eventPage = document.getElementById('eventPage');
+    if (eventPage && eventPage.classList.contains('open')) {
+      eventPage.classList.remove('open');
+      document.body.style.overflow = '';
+      return;
+    }
+    // Close admin if open
+    const adminOverlay = document.getElementById('adminOverlay');
+    if (adminOverlay && adminOverlay.classList.contains('open')) {
+      adminOverlay.classList.remove('open');
+      document.body.style.overflow = '';
+      return;
+    }
+  });
 
   function epSelectTicket(el, price, tid) {
     document.querySelectorAll('.ep-ticket-type').forEach(t => t.classList.remove('selected'));
@@ -2243,6 +2335,7 @@ img, video, canvas {
         document.getElementById('userDropdown').classList.remove('open');
         document.getElementById('adminOverlay').classList.add('open');
         document.body.style.overflow = 'hidden';
+        history.pushState({ page: 'admin' }, '', '#admin');
         loadAdminData();
       });
   }
@@ -2512,6 +2605,24 @@ img, video, canvas {
     showToast('Ticket type removed', 'var(--muted)');
     loadTicketTypes();
   }
+
+  // ── THEME TOGGLE ──────────────────────────────────────────────────
+  function toggleTheme() {
+    const isLight = document.body.classList.toggle('light-mode');
+    const knob    = document.getElementById('themeKnob');
+    knob.textContent = isLight ? '☀️' : '🌙';
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  }
+
+  // Apply saved theme on load
+  (function() {
+    const saved = localStorage.getItem('theme');
+    if (saved === 'light') {
+      document.body.classList.add('light-mode');
+      const knob = document.getElementById('themeKnob');
+      if (knob) knob.textContent = '☀️';
+    }
+  })();
 </script>
 <!-- ── ADMIN DASHBOARD ── -->
 <div class="admin-overlay" id="adminOverlay">
@@ -2577,7 +2688,7 @@ img, video, canvas {
 </div>
 
 <!-- ── EVENT FORM MODAL ── -->
-<div class="admin-form-overlay" id="adminFormOverlay" onclick="closeFormOnBg(event)">
+<div class="admin-form-overlay" id="adminFormOverlay">
   <div class="admin-form-box">
     <button style="position:absolute;top:16px;right:20px;background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer" onclick="closeEventForm()">✕</button>
     <div class="admin-form-title" id="formTitle">Add New Event</div>
