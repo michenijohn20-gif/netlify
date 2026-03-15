@@ -1273,6 +1273,90 @@ img, video, canvas {
     }
     .pwd-match.show { display: flex; }
     body.light-mode .pwd-reqs { background: #f5f3ee; }
+    /* ── ORGANIZER DASHBOARD ── */
+    .org-overlay { position:fixed; inset:0; z-index:290; background:var(--black); overflow-y:auto; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+    .org-overlay.open { opacity:1; pointer-events:all; }
+    body.light-mode .org-overlay { background:#f5f3ee; }
+    .org-nav { background:var(--deep); border-bottom:1px solid var(--border); padding:16px 32px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; }
+    body.light-mode .org-nav { background:#ece9e2; border-color:rgba(0,0,0,0.08); }
+    .org-nav-left { display:flex; align-items:center; gap:14px; }
+    .org-logo { font-family:var(--font-display); font-size:1.1rem; font-weight:900; color:var(--gold); }
+    .org-logo span { color:var(--white); }
+    body.light-mode .org-logo span { color:#1a1a1a; }
+    .org-badge { background:rgba(78,203,113,0.15); border:1px solid rgba(78,203,113,0.3); color:var(--green); font-size:0.68rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:3px 10px; border-radius:10px; }
+    .org-close-btn { background:none; border:1px solid var(--border); color:var(--muted); padding:7px 16px; border-radius:6px; font-family:var(--font-body); font-size:0.82rem; cursor:pointer; transition:all 0.2s; }
+    .org-close-btn:hover { border-color:var(--white); color:var(--white); }
+    body.light-mode .org-close-btn:hover { border-color:#1a1a1a; color:#1a1a1a; }
+    .org-body { flex:1; padding:32px; max-width:1000px; margin:0 auto; width:100%; }
+    .org-greeting { margin-bottom:28px; }
+    .org-greeting h2 { font-family:var(--font-display); font-size:1.8rem; font-weight:800; letter-spacing:-0.8px; margin-bottom:4px; }
+    body.light-mode .org-greeting h2 { color:#1a1a1a; }
+    .org-greeting p { color:var(--muted); font-size:0.9rem; }
+    .org-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:32px; }
+    .org-stat { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:18px; }
+    body.light-mode .org-stat { background:#fff; }
+    .org-stat-num { font-family:var(--font-display); font-size:1.8rem; font-weight:800; color:var(--gold); line-height:1; margin-bottom:4px; }
+    .org-stat-lbl { font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.8px; }
+    .org-section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+    .org-section-title { font-family:var(--font-display); font-size:1.2rem; font-weight:800; letter-spacing:-0.3px; }
+    body.light-mode .org-section-title { color:#1a1a1a; }
+    .org-add-btn { background:var(--green); color:#fff; border:none; padding:9px 18px; border-radius:6px; font-family:var(--font-body); font-size:0.85rem; font-weight:700; cursor:pointer; transition:transform 0.2s; display:flex; align-items:center; gap:6px; }
+    .org-add-btn:hover { transform:translateY(-1px); }
+    .org-event-row { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px 18px; margin-bottom:10px; display:flex; align-items:center; gap:14px; }
+    body.light-mode .org-event-row { background:#fff; }
+    .org-event-thumb { width:52px; height:52px; border-radius:8px; object-fit:cover; flex-shrink:0; background:linear-gradient(135deg,#1a0533,#6a1faa); display:flex; align-items:center; justify-content:center; font-size:1.4rem; }
+    .org-event-info { flex:1; min-width:0; }
+    .org-event-name { font-weight:600; font-size:0.9rem; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    body.light-mode .org-event-name { color:#1a1a1a; }
+    .org-event-meta { font-size:0.76rem; color:var(--muted); }
+    .org-event-actions { display:flex; gap:8px; flex-shrink:0; }
+    .org-action-btn { background:none; border:1px solid var(--border); color:var(--white); padding:5px 11px; border-radius:5px; font-family:var(--font-body); font-size:0.76rem; cursor:pointer; transition:all 0.2s; }
+    body.light-mode .org-action-btn { color:#1a1a1a; }
+    .org-action-btn:hover { background:rgba(255,255,255,0.06); }
+    .org-action-btn.danger { color:var(--red); }
+    .org-action-btn.danger:hover { background:rgba(232,93,93,0.1); border-color:var(--red); }
+    .org-action-btn.publish { color:var(--green); }
+    .org-action-btn.publish:hover { background:rgba(78,203,113,0.1); border-color:var(--green); }
+    .org-empty { text-align:center; padding:48px 0; color:var(--muted); }
+    .org-empty-icon { font-size:3rem; margin-bottom:12px; opacity:0.4; }
+    /* Apply form */
+    .org-apply-wrap { max-width:520px; margin:0 auto; }
+    .org-apply-title { font-family:var(--font-display); font-size:1.6rem; font-weight:800; margin-bottom:8px; }
+    body.light-mode .org-apply-title { color:#1a1a1a; }
+    .org-apply-sub { color:var(--muted); font-size:0.875rem; margin-bottom:28px; line-height:1.7; }
+    .org-field { margin-bottom:16px; }
+    .org-field label { display:block; font-size:0.72rem; font-weight:600; letter-spacing:0.8px; text-transform:uppercase; color:var(--muted); margin-bottom:7px; }
+    .org-field input, .org-field select, .org-field textarea { width:100%; background:var(--card); border:1px solid var(--border); border-radius:7px; padding:11px 13px; color:var(--white); font-family:var(--font-body); font-size:0.9rem; outline:none; transition:border-color 0.2s; }
+    body.light-mode .org-field input, body.light-mode .org-field select, body.light-mode .org-field textarea { background:#f5f3ee; color:#1a1a1a; border-color:rgba(0,0,0,0.1); }
+    .org-field input:focus, .org-field select:focus, .org-field textarea:focus { border-color:var(--green); }
+    .org-field select option { background:var(--card); }
+    .org-field textarea { min-height:80px; resize:vertical; }
+    .org-submit-btn { width:100%; background:var(--green); color:#fff; border:none; border-radius:7px; padding:14px; font-family:var(--font-body); font-size:0.95rem; font-weight:700; cursor:pointer; transition:transform 0.2s; margin-top:4px; }
+    .org-submit-btn:hover { transform:translateY(-1px); }
+    .org-submit-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+    /* Pending state */
+    .org-pending-wrap { text-align:center; padding:48px 24px; }
+    .org-pending-icon { font-size:3.5rem; margin-bottom:16px; }
+    .org-pending-title { font-family:var(--font-display); font-size:1.4rem; font-weight:800; margin-bottom:10px; }
+    body.light-mode .org-pending-title { color:#1a1a1a; }
+    .org-pending-sub { color:var(--muted); font-size:0.875rem; line-height:1.7; max-width:360px; margin:0 auto; }
+    /* Admin organizer requests */
+    .req-row { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px 18px; margin-bottom:10px; }
+    body.light-mode .req-row { background:#fff; }
+    .req-name { font-weight:600; font-size:0.9rem; margin-bottom:2px; }
+    body.light-mode .req-name { color:#1a1a1a; }
+    .req-meta { font-size:0.78rem; color:var(--muted); margin-bottom:10px; }
+    .req-actions { display:flex; gap:8px; }
+    .req-approve { background:var(--green); color:#fff; border:none; padding:6px 16px; border-radius:5px; font-family:var(--font-body); font-size:0.8rem; font-weight:600; cursor:pointer; }
+    .req-reject  { background:none; border:1px solid var(--red); color:var(--red); padding:6px 14px; border-radius:5px; font-family:var(--font-body); font-size:0.8rem; cursor:pointer; }
+    @media (max-width:600px) {
+      .org-nav { padding:12px 16px; }
+      .org-body { padding:16px; }
+      .org-stats { grid-template-columns:1fr 1fr; gap:10px; }
+      .org-event-row { flex-wrap:wrap; }
+      .org-event-actions { width:100%; margin-top:8px; }
+      .org-action-btn { flex:1; text-align:center; }
+    }
   </style>
 </head>
 <body>
@@ -1303,6 +1387,7 @@ img, video, canvas {
           <a href="#" onclick="openPanel('profile')">👤 Profile</a>
           <a href="#" onclick="openPanel('wishlist')">❤️ Wishlist</a>
           <a href="#" id="adminLink" style="display:none;color:var(--gold)" onclick="openAdmin()">⚙️ Admin Dashboard</a>
+          <a href="#" id="orgLink" style="display:none;color:var(--green)" onclick="openOrgDashboard()">🎪 Organizer Dashboard</a>
           <button class="signout-btn" onclick="signOut()">↩ Sign Out</button>
         </div>
       </div>
@@ -1328,6 +1413,7 @@ img, video, canvas {
   <a class="mob-nav-link" href="#" onclick="closeMobNav();openPanel('wishlist')">Wishlist</a>
   <a class="mob-nav-link" href="#" onclick="closeMobNav();openPanel('profile')" id="mobProfile" style="display:none">Profile</a>
   <a class="mob-nav-link" href="#" id="mobAdminLink" style="display:none;color:var(--gold)" onclick="closeMobNav();openAdmin()">⚙️ Admin</a>
+  <a class="mob-nav-link" href="#" id="mobOrgLink" style="display:none;color:var(--green)" onclick="closeMobNav();openOrgDashboard()">🎪 My Dashboard</a>
   <div class="mob-nav-actions">
     <button class="mob-nav-btn primary" id="mobSignIn" onclick="closeMobNav();openAuthModal(null)">Sign In</button>
     <button class="mob-nav-btn ghost" id="mobSignUp" onclick="closeMobNav();switchTab('signup');openAuthModal(null)">Create Account</button>
@@ -1644,6 +1730,13 @@ img, video, canvas {
         </div>
         <button class="profile-save" id="cpSaveBtn" onclick="changePassword()" style="background:var(--deep);border:1px solid var(--border);color:var(--white)">Update Password</button>
         <p class="profile-msg" id="cpMsg"></p>
+
+        <!-- Organizer CTA — shown if not yet organizer -->
+        <div id="becomeOrgSection" style="margin-top:28px;padding-top:24px;border-top:1px solid var(--border);display:none">
+          <div class="profile-section-title">For Event Organizers</div>
+          <p style="color:var(--muted);font-size:0.85rem;line-height:1.7;margin-bottom:14px">Want to list your own events on TicketVault? Apply to become an organizer and get your own dashboard.</p>
+          <button class="profile-save" style="background:var(--green);color:#fff" onclick="closePanel();openOrgDashboard()">🎪 Organizer Portal →</button>
+        </div>
       </div>
     </div>
 
@@ -1856,13 +1949,23 @@ img, video, canvas {
       if (footerSignIn)   footerSignIn.style.display   = 'none';
       if (footerRegister) footerRegister.style.display = 'none';
 
-      supabaseClient.from('profiles').select('is_organizer').eq('id', currentUser.id).single()
+      supabaseClient.from('profiles').select('is_organizer, organizer_status').eq('id', currentUser.id).single()
         .then(({ data }) => {
           const adminLink    = document.getElementById('adminLink');
           const mobAdminLink = document.getElementById('mobAdminLink');
+          const orgLink      = document.getElementById('orgLink');
+          const mobOrgLink   = document.getElementById('mobOrgLink');
+          const orgCTA       = document.getElementById('becomeOrgSection');
           const isAdmin      = data?.is_organizer;
+          const orgStatus    = data?.organizer_status || 'none';
+          const isOrg        = orgStatus === 'approved';
+
           if (adminLink)    adminLink.style.display    = isAdmin ? 'flex'  : 'none';
           if (mobAdminLink) mobAdminLink.style.display = isAdmin ? 'block' : 'none';
+          if (orgLink)      orgLink.style.display      = isOrg   ? 'flex'  : 'none';
+          if (mobOrgLink)   mobOrgLink.style.display   = isOrg   ? 'block' : 'none';
+          // Show "Become an Organizer" CTA only if not already one or applied
+          if (orgCTA) orgCTA.style.display = (!isAdmin && orgStatus === 'none') ? 'block' : 'none';
         });
     } else {
       signInEl.style.display = 'block';
@@ -3284,6 +3387,7 @@ img, video, canvas {
     ).join('');
 
     renderAdminTable(events);
+    loadOrgRequests();
   }
 
   function saveFeaturedEvent() {
@@ -3522,6 +3626,334 @@ img, video, canvas {
     loadTicketTypes();
   }
 
+  // ── ORGANIZER DASHBOARD ───────────────────────────────────────────
+
+  async function openOrgDashboard() {
+    if (!currentUser) { openAuthModal(null); showAuthError('Please sign in first.'); return; }
+    document.getElementById('userDropdown').classList.remove('open');
+    document.getElementById('orgOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    history.pushState({ page: 'organizer' }, '', '#organizer');
+    await renderOrgView();
+  }
+
+  function closeOrgDashboard() {
+    document.getElementById('orgOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    if (history.state && history.state.page === 'organizer') history.back();
+  }
+
+  // Decide which view to show based on organizer_status
+  async function renderOrgView() {
+    const body = document.getElementById('orgBody');
+    body.innerHTML = '<div class="panel-loading" style="padding:60px 0;text-align:center;color:var(--muted)">Loading…</div>';
+
+    const { data: profile } = await supabaseClient
+      .from('profiles').select('organizer_status, organizer_name, full_name')
+      .eq('id', currentUser.id).single();
+
+    const status = profile?.organizer_status || 'none';
+
+    if (status === 'approved') {
+      renderOrgDashboardView(profile);
+    } else if (status === 'pending') {
+      renderOrgPendingView();
+    } else {
+      renderOrgApplyView(profile);
+    }
+  }
+
+  // ── VIEW 1: Application form ──────────────────────────────────────
+  function renderOrgApplyView(profile) {
+    document.getElementById('orgBody').innerHTML = `
+      <div class="org-apply-wrap">
+        <div class="org-apply-title">Become an Organizer</div>
+        <p class="org-apply-sub">List your events on TicketVault and reach thousands of fans. Fill in your details below and we'll review your application within 24 hours.</p>
+        <div class="org-field"><label>Your Name *</label>
+          <input type="text" id="appName" value="${profile?.full_name || ''}" placeholder="Your full name"/></div>
+        <div class="org-field"><label>Organization / Business Name *</label>
+          <input type="text" id="appOrgName" placeholder="e.g. Nairobi Events Ltd"/></div>
+        <div class="org-field"><label>Email *</label>
+          <input type="email" id="appEmail" value="${currentUser.email}" readonly style="opacity:0.6"/></div>
+        <div class="org-field"><label>Phone Number *</label>
+          <input type="tel" id="appPhone" placeholder="+254 7XX XXX XXX"/></div>
+        <div class="org-field"><label>Type of Events You Run *</label>
+          <select id="appType">
+            <option value="">Select a category</option>
+            <option value="concert">Concerts & Live Music</option>
+            <option value="festival">Festivals</option>
+            <option value="sports">Sports Events</option>
+            <option value="theatre">Theatre & Arts</option>
+            <option value="comedy">Comedy Shows</option>
+            <option value="corporate">Corporate & Conferences</option>
+            <option value="other">Other</option>
+          </select></div>
+        <div class="org-field"><label>Tell us about your events</label>
+          <textarea id="appBio" placeholder="Describe the type of events you organise, how many per year, expected audience size…"></textarea></div>
+        <button class="org-submit-btn" id="appSubmitBtn" onclick="submitOrgApplication()">Submit Application →</button>
+        <p id="appMsg" style="text-align:center;font-size:0.83rem;margin-top:12px;min-height:18px"></p>
+      </div>`;
+  }
+
+  async function submitOrgApplication() {
+    const name    = document.getElementById('appName').value.trim();
+    const orgName = document.getElementById('appOrgName').value.trim();
+    const phone   = document.getElementById('appPhone').value.trim();
+    const type    = document.getElementById('appType').value;
+    const bio     = document.getElementById('appBio').value.trim();
+    const msg     = document.getElementById('appMsg');
+    const btn     = document.getElementById('appSubmitBtn');
+
+    if (!name || !orgName || !phone || !type) {
+      msg.textContent = '⚠️ Please fill in all required fields.';
+      msg.style.color = 'var(--red)'; return;
+    }
+
+    btn.disabled = true; btn.textContent = 'Submitting…';
+    msg.textContent = ''; 
+
+    const { error } = await supabaseClient.from('profiles').upsert({
+      id: currentUser.id,
+      full_name: name,
+      phone,
+      organizer_name: orgName,
+      organizer_status: 'pending',
+      organizer_type: type,
+      organizer_bio: bio,
+    });
+
+    btn.disabled = false; btn.textContent = 'Submit Application →';
+
+    if (error) {
+      msg.textContent = '❌ ' + error.message; msg.style.color = 'var(--red)'; return;
+    }
+
+    renderOrgPendingView();
+  }
+
+  // ── VIEW 2: Pending approval ──────────────────────────────────────
+  function renderOrgPendingView() {
+    document.getElementById('orgBody').innerHTML = `
+      <div class="org-pending-wrap">
+        <div class="org-pending-icon">⏳</div>
+        <div class="org-pending-title">Application Under Review</div>
+        <p class="org-pending-sub">Your organizer application has been submitted. Our team will review it within 24 hours. You'll be able to list events once approved.<br/><br/>Questions? Contact us at <a href="mailto:hello@ticketvault.co.ke" style="color:var(--gold)">hello@ticketvault.co.ke</a></p>
+        <button class="org-submit-btn" style="margin-top:28px;max-width:200px;margin-left:auto;margin-right:auto;display:block" onclick="closeOrgDashboard()">Back to Site</button>
+      </div>`;
+  }
+
+  // ── VIEW 3: Approved organizer dashboard ──────────────────────────
+  async function renderOrgDashboardView(profile) {
+    const body = document.getElementById('orgBody');
+
+    // Load this organizer's events
+    const [eventsRes, bookingsRes] = await Promise.all([
+      supabaseClient.from('events').select('*').eq('organizer_id', currentUser.id).order('date', { ascending: false }),
+      supabaseClient.from('bookings').select('total_amount, status, event_id')
+    ]);
+
+    const events   = eventsRes.data || [];
+    const bookings = bookingsRes.data || [];
+
+    // Filter bookings to only this organizer's events
+    const myEventIds = new Set(events.map(e => e.id));
+    const myBookings = bookings.filter(b => myEventIds.has(b.event_id));
+    const revenue    = myBookings.filter(b => b.status === 'confirmed').reduce((s, b) => s + Number(b.total_amount), 0);
+    const published  = events.filter(e => e.is_published).length;
+
+    const name = profile?.organizer_name || profile?.full_name || 'Organizer';
+
+    body.innerHTML = `
+      <div class="org-greeting">
+        <h2>Welcome, ${name} 👋</h2>
+        <p>Manage your events and track your ticket sales from here.</p>
+      </div>
+      <div class="org-stats">
+        <div class="org-stat"><div class="org-stat-num">${events.length}</div><div class="org-stat-lbl">Total Events</div></div>
+        <div class="org-stat"><div class="org-stat-num">${myBookings.length}</div><div class="org-stat-lbl">Tickets Sold</div></div>
+        <div class="org-stat"><div class="org-stat-num">KES ${revenue.toLocaleString()}</div><div class="org-stat-lbl">Revenue</div></div>
+      </div>
+      <div class="org-section-header">
+        <div class="org-section-title">Your Events</div>
+        <button class="org-add-btn" onclick="openOrgEventForm()">＋ Add Event</button>
+      </div>
+      <div id="orgEventsList">
+        ${events.length === 0
+          ? `<div class="org-empty"><div class="org-empty-icon">🎪</div><p>No events yet. Click "Add Event" to list your first event.</p></div>`
+          : events.map(e => {
+              const dateStr = e.date ? new Date(e.date).toLocaleDateString('en-KE', { day:'numeric', month:'short', year:'numeric' }) : '—';
+              const sales   = myBookings.filter(b => b.event_id === e.id).length;
+              return `<div class="org-event-row">
+                <div class="org-event-thumb">${e.image_url ? `<img src="${e.image_url}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">` : '🎟'}</div>
+                <div class="org-event-info">
+                  <div class="org-event-name">${e.title}</div>
+                  <div class="org-event-meta">📅 ${dateStr} · 🎟 ${sales} sold · <span style="color:${e.is_published ? 'var(--green)' : 'var(--muted)'}">${e.is_published ? '✓ Live' : '⏸ Draft'}</span></div>
+                </div>
+                <div class="org-event-actions">
+                  <button class="org-action-btn" onclick="openOrgEventForm('${e.id}')">✏️ Edit</button>
+                  <button class="org-action-btn publish" onclick="orgTogglePublish('${e.id}',${e.is_published})">${e.is_published ? '⏸ Unpublish' : '▶ Publish'}</button>
+                  <button class="org-action-btn danger" onclick="orgDeleteEvent('${e.id}','${e.title.replace(/'/g,"\\'")}')">🗑</button>
+                </div>
+              </div>`;
+            }).join('')
+        }
+      </div>`;
+  }
+
+  async function orgTogglePublish(id, current) {
+    await supabaseClient.from('events').update({ is_published: !current }).eq('id', id).eq('organizer_id', currentUser.id);
+    showToast(current ? '⏸ Event unpublished' : '✅ Event is now live!', 'var(--green)');
+    renderOrgView(); loadEvents();
+  }
+
+  async function orgDeleteEvent(id, name) {
+    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+    await supabaseClient.from('events').delete().eq('id', id).eq('organizer_id', currentUser.id);
+    showToast('Event deleted', 'var(--muted)');
+    renderOrgView(); loadEvents();
+  }
+
+  // ── ORG EVENT FORM ────────────────────────────────────────────────
+  let orgEditingId = null;
+
+  async function openOrgEventForm(eventId) {
+    orgEditingId = eventId || null;
+    const body   = document.getElementById('orgBody');
+    let e        = {};
+    if (eventId) {
+      const { data } = await supabaseClient.from('events').select('*').eq('id', eventId).single();
+      if (data) e = data;
+    }
+
+    body.innerHTML = `
+      <div style="max-width:580px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+          <button onclick="renderOrgView()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem">←</button>
+          <div class="org-apply-title" style="margin:0">${eventId ? 'Edit Event' : 'Add New Event'}</div>
+        </div>
+        <div class="org-field"><label>Event Title *</label><input type="text" id="oefTitle" value="${e.title||''}" placeholder="e.g. Sauti Sol Live"/></div>
+        <div class="org-field"><label>Description</label><textarea id="oefDesc" placeholder="Describe your event…">${e.description||''}</textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div class="org-field"><label>Date *</label><input type="date" id="oefDate" value="${e.date||''}"/></div>
+          <div class="org-field"><label>Time</label><input type="time" id="oefTime" value="${e.time||''}"/></div>
+          <div class="org-field"><label>End Date</label><input type="date" id="oefEndDate" value="${e.end_date||''}"/></div>
+          <div class="org-field"><label>Category *</label>
+            <select id="oefCat">
+              <option value="">Select…</option>
+              ${['concert','festival','sports','theatre','comedy','art'].map(c =>
+                `<option value="${c}" ${e.category===c?'selected':''}>${c.charAt(0).toUpperCase()+c.slice(1)}</option>`
+              ).join('')}
+            </select></div>
+          <div class="org-field"><label>Venue *</label><input type="text" id="oefVenue" value="${e.venue||''}" placeholder="Venue name"/></div>
+          <div class="org-field"><label>City *</label><input type="text" id="oefCity" value="${e.city||''}" placeholder="Nairobi"/></div>
+        </div>
+        <div class="org-field"><label>Image URL</label>
+          <input type="text" id="oefImage" value="${e.image_url||''}" placeholder="https://…" oninput="orgPreviewImg(this.value)"/>
+          <img id="oefImgPreview" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-top:8px;display:${e.image_url?'block':'none'}" src="${e.image_url||''}"/>
+        </div>
+        <div class="org-field"><label>Publish Status</label>
+          <select id="oefPublished">
+            <option value="false" ${!e.is_published?'selected':''}>🔒 Draft — not visible yet</option>
+            <option value="true" ${e.is_published?'selected':''}>✅ Live — visible to public</option>
+          </select></div>
+        <button class="org-submit-btn" id="oefSaveBtn" onclick="saveOrgEvent()">Save Event</button>
+        <p id="oefMsg" style="text-align:center;font-size:0.82rem;margin-top:12px;min-height:18px"></p>
+      </div>`;
+  }
+
+  function orgPreviewImg(url) {
+    const img = document.getElementById('oefImgPreview');
+    if (!img) return;
+    img.style.display = url.startsWith('http') ? 'block' : 'none';
+    img.src = url;
+  }
+
+  async function saveOrgEvent() {
+    const btn   = document.getElementById('oefSaveBtn');
+    const msg   = document.getElementById('oefMsg');
+    const title = document.getElementById('oefTitle').value.trim();
+    const date  = document.getElementById('oefDate').value;
+    const venue = document.getElementById('oefVenue').value.trim();
+    const city  = document.getElementById('oefCity').value.trim();
+    const cat   = document.getElementById('oefCat').value;
+
+    if (!title || !date || !venue || !city || !cat) {
+      msg.textContent = '⚠️ Please fill in all required fields.';
+      msg.style.color = 'var(--red)'; return;
+    }
+
+    btn.disabled = true; btn.textContent = 'Saving…'; msg.textContent = '';
+
+    const payload = {
+      title,
+      description:  document.getElementById('oefDesc').value.trim() || null,
+      date,
+      time:         document.getElementById('oefTime').value || null,
+      end_date:     document.getElementById('oefEndDate').value || null,
+      category:     cat, venue, city,
+      image_url:    document.getElementById('oefImage').value.trim() || null,
+      is_published: document.getElementById('oefPublished').value === 'true',
+      organizer_id: currentUser.id,
+    };
+
+    const { error } = orgEditingId
+      ? await supabaseClient.from('events').update(payload).eq('id', orgEditingId).eq('organizer_id', currentUser.id)
+      : await supabaseClient.from('events').insert(payload);
+
+    btn.disabled = false; btn.textContent = 'Save Event';
+
+    if (error) { msg.textContent = '❌ ' + error.message; msg.style.color = 'var(--red)'; return; }
+
+    showToast(orgEditingId ? '✅ Event updated!' : '✅ Event added!', 'var(--green)');
+    orgEditingId = null;
+    renderOrgView();
+    loadEvents();
+  }
+
+  // ── ADMIN: Organizer Requests ─────────────────────────────────────
+  async function loadOrgRequests() {
+    const wrap = document.getElementById('adminOrgRequests');
+    if (!wrap) return;
+    wrap.innerHTML = '<div class="admin-loading">Loading…</div>';
+
+    const { data } = await supabaseClient
+      .from('profiles')
+      .select('id, full_name, organizer_name, organizer_type, organizer_bio, phone, organizer_status')
+      .eq('organizer_status', 'pending')
+      .order('created_at', { ascending: true });
+
+    const badge = document.getElementById('orgReqBadge');
+    if (badge) { badge.textContent = (data||[]).length; badge.style.display = (data||[]).length ? 'inline' : 'none'; }
+
+    if (!data || data.length === 0) {
+      wrap.innerHTML = '<div class="admin-loading" style="color:var(--muted)">No pending requests.</div>'; return;
+    }
+
+    wrap.innerHTML = data.map(r => `
+      <div class="req-row" id="reqRow-${r.id}">
+        <div class="req-name">${r.organizer_name || r.full_name || '—'} <span style="color:var(--muted);font-weight:400;font-size:0.82rem">· ${r.organizer_type || ''}</span></div>
+        <div class="req-meta">${r.full_name || ''} · ${r.phone || ''}<br/>${r.organizer_bio ? `"${r.organizer_bio.substring(0,120)}…"` : ''}</div>
+        <div class="req-actions">
+          <button class="req-approve" onclick="approveOrg('${r.id}')">✅ Approve</button>
+          <button class="req-reject"  onclick="rejectOrg('${r.id}')">✕ Decline</button>
+        </div>
+      </div>`).join('');
+  }
+
+  async function approveOrg(userId) {
+    await supabaseClient.from('profiles').update({ organizer_status: 'approved', is_organizer: false }).eq('id', userId);
+    document.getElementById('reqRow-' + userId)?.remove();
+    showToast('✅ Organizer approved!', 'var(--green)');
+    loadOrgRequests();
+  }
+
+  async function rejectOrg(userId) {
+    await supabaseClient.from('profiles').update({ organizer_status: 'rejected' }).eq('id', userId);
+    document.getElementById('reqRow-' + userId)?.remove();
+    showToast('Organizer request declined', 'var(--muted)');
+    loadOrgRequests();
+  }
+
   // ── THEME TOGGLE ──────────────────────────────────────────────────
   function toggleTheme() {
     const isLight = document.body.classList.toggle('light-mode');
@@ -3594,6 +4026,15 @@ img, video, canvas {
           </select>
         </div>
         <button class="admin-add-btn" style="margin-top:22px" onclick="saveFeaturedEvent()">⚡ Set as Featured</button>
+      </div>
+
+      <!-- Organizer Requests -->
+      <div class="admin-section-header" style="margin-bottom:12px;margin-top:8px">
+        <div class="admin-section-title">🙋 Organizer Requests <span id="orgReqBadge" style="background:rgba(232,93,93,0.2);color:var(--red);font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:8px;display:none"></span></div>
+        <button class="admin-action-btn" onclick="loadOrgRequests()" style="font-size:0.78rem">↻ Refresh</button>
+      </div>
+      <div id="adminOrgRequests" style="margin-bottom:32px">
+        <div class="admin-loading">Loading requests…</div>
       </div>
 
       <!-- Events Table -->
@@ -3767,6 +4208,27 @@ img, video, canvas {
         <p style="text-align:center;color:var(--muted);font-size:0.75rem;margin-top:12px">🔒 Secure checkout · Instant e-ticket delivery</p>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ── ORGANIZER DASHBOARD ── -->
+<div class="org-overlay" id="orgOverlay">
+  <div style="min-height:100vh;display:flex;flex-direction:column;">
+
+    <!-- Nav -->
+    <div class="org-nav">
+      <div class="org-nav-left">
+        <div class="org-logo">Ticket<span>Vault</span></div>
+        <div class="org-badge">🎪 Organizer Portal</div>
+      </div>
+      <button class="org-close-btn" onclick="closeOrgDashboard()">← Back to Site</button>
+    </div>
+
+    <!-- Body -->
+    <div class="org-body" id="orgBody">
+      <div class="panel-loading" style="padding:60px 0;text-align:center;color:var(--muted)">Loading…</div>
+    </div>
+
   </div>
 </div>
 
