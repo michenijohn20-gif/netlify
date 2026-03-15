@@ -732,19 +732,225 @@ img, video, canvas {
     .user-dropdown a:hover, .user-dropdown button:hover { background: rgba(255,255,255,0.05); }
     .user-dropdown .signout-btn { color: var(--red); border-top: 1px solid var(--border); }
 
-    @media (max-width: 900px) {
-      nav { padding: 16px 20px; }
+    /* ══════════════════════════════════════════
+       MOBILE — 600px and below
+    ══════════════════════════════════════════ */
+    @media (max-width: 600px) {
+      /* ── NAVBAR ── */
+      nav { padding: 14px 16px; }
       .nav-links { display: none; }
-      .hero { padding: 0 20px 60px; }
-      .hero-stats { display: none; }
-      section, .search-section { padding-left: 20px; padding-right: 20px; }
+      .logo { font-size: 1.2rem; }
+
+      /* Hamburger button */
+      .mob-menu-btn {
+        display: flex; flex-direction: column; gap: 5px;
+        background: none; border: none; cursor: pointer; padding: 4px; z-index: 101;
+      }
+      .mob-menu-btn span {
+        display: block; width: 22px; height: 2px;
+        background: var(--white); border-radius: 2px;
+        transition: all 0.3s;
+      }
+      body.light-mode .mob-menu-btn span { background: #1a1a1a; }
+
+      /* Mobile nav drawer */
+      .mob-nav-drawer {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: var(--deep); z-index: 200;
+        display: flex; flex-direction: column;
+        padding: 80px 28px 40px;
+        transform: translateX(-100%);
+        transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+        overflow-y: auto;
+      }
+      .mob-nav-drawer.open { transform: translateX(0); }
+      .mob-nav-close {
+        position: absolute; top: 18px; right: 18px;
+        background: none; border: none; color: var(--muted);
+        font-size: 1.4rem; cursor: pointer;
+      }
+      .mob-nav-link {
+        font-family: var(--font-display); font-size: 1.6rem;
+        font-weight: 800; color: var(--white); text-decoration: none;
+        padding: 14px 0; border-bottom: 1px solid var(--border);
+        display: block; letter-spacing: -0.5px;
+      }
+      body.light-mode .mob-nav-link { color: #1a1a1a; }
+      .mob-nav-link:last-child { border-bottom: none; }
+      .mob-nav-actions { margin-top: 32px; display: flex; flex-direction: column; gap: 12px; }
+      .mob-nav-btn {
+        width: 100%; padding: 14px; border-radius: 6px; border: none;
+        font-family: var(--font-body); font-size: 1rem; font-weight: 700;
+        cursor: pointer; text-align: center;
+      }
+      .mob-nav-btn.primary { background: var(--gold); color: #fff; }
+      .mob-nav-btn.ghost   { background: none; border: 1px solid var(--border); color: var(--white); }
+      body.light-mode .mob-nav-btn.ghost { color: #1a1a1a; }
+
+      /* ── HERO SLIDESHOW ── */
+      .hero { height: 56vh; min-height: 380px; }
+      .slide-content { padding: 0 16px 0 16px; max-width: 100%; }
+      .slide-title { font-size: clamp(1.4rem, 7vw, 2rem); letter-spacing: -0.5px; }
+      .slide-meta { font-size: 0.78rem; gap: 10px; flex-wrap: wrap; }
+      .slide-actions { gap: 8px; }
+      .slide-btn-primary { padding: 9px 18px; font-size: 0.82rem; }
+      .slide-btn-ghost { padding: 9px 14px; font-size: 0.82rem; }
+      .slide-dots { left: 16px; bottom: 16px; }
+      .slide-counter { right: 16px; bottom: 20px; }
+      .slide-arrow { display: none !important; }
+
+      /* ── SEARCH ── */
+      .search-section { padding: 0 16px; margin-top: 16px; }
+      .search-bar {
+        flex-direction: column; padding: 16px;
+        gap: 0; border-radius: 10px;
+      }
+      .search-field {
+        border-right: none !important;
+        border-bottom: 1px solid var(--border);
+        padding: 12px 0; padding-right: 0;
+      }
+      .search-field:last-of-type { border-bottom: none; }
+      .search-btn { width: 100%; margin-top: 12px; padding: 12px; border-radius: 6px; }
+
+      /* ── SECTIONS ── */
+      section { padding: 40px 16px; }
+      .section-title { font-size: clamp(1.5rem, 6vw, 2.4rem); }
+      .section-header { flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 28px; }
+
+      /* ── EVENT CARDS ── */
+      .events-grid { grid-template-columns: 1fr; gap: 16px; }
+      .card-img-wrap { height: 180px; }
+
+      /* ── FEATURED ── */
+      .featured-banner { grid-template-columns: 1fr; }
+      .featured-img { height: 180px; }
+      .featured-content { padding: 24px 20px; }
+      .featured-title { font-size: 1.6rem; }
+      .featured-info { flex-wrap: wrap; gap: 16px; }
+      .featured-img::after { background: linear-gradient(to top, var(--card) 0%, transparent 60%) !important; }
+
+      /* ── CATEGORIES ── */
+      .categories { gap: 8px; }
+      .cat-pill { padding: 7px 14px; font-size: 0.78rem; }
+
+      /* ── VENUES ── */
+      .venues-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .venue-card { padding: 16px 12px; }
+      .venue-icon { font-size: 1.8rem; margin-bottom: 8px; }
+      .venue-name { font-size: 0.9rem; }
+
+      /* ── NEWSLETTER ── */
+      .newsletter { margin: 0 16px 48px; padding: 32px 20px; }
+      .newsletter h2 { font-size: 1.6rem; }
+      .newsletter-form { flex-direction: column; }
+
+      /* ── FOOTER ── */
+      footer { padding: 32px 16px 20px; }
+      .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+      .footer-brand p { max-width: 100%; }
+      .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+
+      /* ── TICKET MODAL ── */
+      .modal { width: 100%; max-width: 100%; border-radius: 16px 16px 0 0; margin-top: auto; max-height: 85vh; }
+      .modal-overlay { align-items: flex-end; }
+      .modal-header { padding: 20px 20px 0; }
+      .modal-body { padding: 16px 20px 24px; }
+
+      /* ── AUTH MODAL ── */
+      .auth-box { width: 100%; max-width: 100%; border-radius: 16px 16px 0 0; padding: 28px 20px 32px; }
+      .auth-overlay { align-items: flex-end; }
+
+      /* ── SIDE PANELS ── */
+      .panel { max-width: 100%; border-left: none; border-top: 1px solid var(--border); }
+      .panel-header { padding: 18px 20px 16px; }
+      .panel-body { padding: 16px 20px; }
+
+      /* ── EVENT DETAIL PAGE ── */
+      .event-page-hero { padding: 0 16px 28px; min-height: 42vh; }
+      .event-page-back { left: 16px; top: 16px; padding: 6px 14px; font-size: 0.8rem; }
+      .event-page-title { font-size: clamp(1.4rem, 6vw, 2rem); }
+      .event-page-body { grid-template-columns: 1fr; padding: 20px 16px; gap: 24px; }
+      .event-page-sidebar { position: static; }
+      .ep-details-grid { grid-template-columns: 1fr 1fr; }
+      .ep-ticket-box { padding: 20px 16px; }
+
+      /* ── ADMIN ── */
+      .admin-nav { padding: 12px 16px; }
+      .admin-badge { display: none; }
+      .admin-body { padding: 16px; }
+      .admin-stats { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+      .admin-stat { padding: 14px; }
+      .admin-stat-num { font-size: 1.5rem; }
+      .admin-section-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+      /* Admin table → cards on mobile */
+      .admin-table thead { display: none; }
+      .admin-table tr { display: block; background: var(--card); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; padding: 14px; }
+      .admin-table td { display: flex; justify-content: space-between; align-items: center; border: none; padding: 6px 0; font-size: 0.82rem; }
+      .admin-table td:first-child { margin-bottom: 8px; }
+      .admin-event-img { width: 40px; height: 40px; }
+      .admin-form-box { padding: 20px 16px; border-radius: 12px 12px 0 0; max-height: 92vh; }
+      .admin-form-overlay { align-items: flex-end; }
+      .admin-form-grid { grid-template-columns: 1fr; }
+      .admin-form-field.full { grid-column: 1; }
+      .admin-confirm-box { width: 90%; padding: 24px 20px; }
+
+      /* ── PROFILE ── */
+      .profile-stat-row { gap: 8px; }
+      .profile-stat { padding: 12px 8px; }
+      .profile-stat-num { font-size: 1.3rem; }
+
+      /* ── MISC ── */
+      .theme-toggle { width: 42px; height: 22px; }
+      .theme-toggle-knob { width: 18px; height: 18px; font-size: 10px; }
+      body.light-mode .theme-toggle-knob { transform: translateX(20px); }
+      .btn-primary { padding: 11px 22px; font-size: 0.875rem; }
+      .qty-btn { width: 28px; height: 28px; }
+    }
+
+    /* ── TABLET — 601px to 900px ── */
+    @media (min-width: 601px) and (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .mob-menu-btn { display: flex; }
+      .hero { height: 60vh; }
+      .slide-content { padding: 0 24px; }
+      .slide-title { font-size: clamp(1.8rem, 4vw, 2.8rem); }
+      .search-section { padding: 0 24px; }
+      .search-bar { flex-wrap: wrap; padding: 16px 20px; gap: 12px; }
+      .search-field { min-width: 45%; border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+      .search-field:nth-child(3), .search-field:nth-child(4) { border-bottom: none; }
+      .search-btn { width: 100%; margin-top: 4px; }
+      section { padding: 56px 24px; }
+      .section-header { flex-direction: row; }
+      .events-grid { grid-template-columns: repeat(2, 1fr); }
       .featured-banner { grid-template-columns: 1fr; }
       .featured-img { height: 200px; }
       .venues-grid { grid-template-columns: repeat(2, 1fr); }
-      .footer-grid { grid-template-columns: 1fr 1fr; }
-      .newsletter { margin: 0 20px 60px; padding: 40px 20px; }
-      .newsletter-form { flex-direction: column; }
-      footer { padding: 40px 20px 20px; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
+      .newsletter { margin: 0 24px 56px; padding: 40px 24px; }
+      footer { padding: 40px 24px 20px; }
+      .modal { max-width: 520px; }
+      .auth-box { max-width: 420px; }
+      .admin-stats { grid-template-columns: repeat(2, 1fr); }
+      .admin-form-grid { grid-template-columns: 1fr; }
+      .admin-body { padding: 20px 24px; }
+      .admin-table thead { display: none; }
+      .admin-table tr { display: block; background: var(--card); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; padding: 14px; }
+      .admin-table td { display: flex; justify-content: space-between; align-items: center; border: none; padding: 6px 0; }
+      .admin-table td:first-child { margin-bottom: 6px; }
+      .event-page-body { grid-template-columns: 1fr; }
+      .event-page-sidebar { position: static; }
+    }
+
+    /* Hide hamburger on desktop */
+    @media (min-width: 901px) {
+      .mob-menu-btn { display: none; }
+      .mob-nav-drawer { display: none !important; }
+      .mob-theme { display: none !important; }
+    }
+    @media (max-width: 900px) {
+      .mob-theme { display: flex !important; }
     }
     /* ── ADMIN DASHBOARD ── */
     .admin-overlay { position:fixed; inset:0; z-index:300; background:var(--black); overflow-y:auto; opacity:0; pointer-events:none; transition:opacity 0.3s; }
@@ -1079,15 +1285,12 @@ img, video, canvas {
     <li><a href="#venues">Venues</a></li>
     <li><a href="#">Artists</a></li>
     <li><a href="#" onclick="openPanel('tickets')">My Tickets</a></li>
-    <!-- Theme toggle -->
     <li>
       <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode">
         <div class="theme-toggle-knob" id="themeKnob">🌙</div>
       </button>
     </li>
-    <!-- Logged OUT: show Sign In button -->
     <li id="navSignIn"><a href="#" class="nav-cta" onclick="openAuthModal(event)">Sign In</a></li>
-    <!-- Logged IN: show user menu (hidden by default) -->
     <li id="navUser" style="display:none">
       <div class="user-menu">
         <button class="user-btn" onclick="toggleUserMenu()">
@@ -1105,7 +1308,32 @@ img, video, canvas {
       </div>
     </li>
   </ul>
+  <!-- Mobile right side: theme toggle + hamburger -->
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="theme-toggle mob-theme" id="themeToggleMob" onclick="toggleTheme()" title="Toggle theme" style="display:none">
+      <div class="theme-toggle-knob" id="themeKnobMob">🌙</div>
+    </button>
+    <button class="mob-menu-btn" id="mobMenuBtn" onclick="openMobNav()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
 </nav>
+
+<!-- MOBILE NAV DRAWER -->
+<div class="mob-nav-drawer" id="mobNavDrawer">
+  <button class="mob-nav-close" onclick="closeMobNav()">✕</button>
+  <a class="mob-nav-link" href="#events" onclick="closeMobNav()">Events</a>
+  <a class="mob-nav-link" href="#venues" onclick="closeMobNav()">Venues</a>
+  <a class="mob-nav-link" href="#" onclick="closeMobNav();openPanel('tickets')">My Tickets</a>
+  <a class="mob-nav-link" href="#" onclick="closeMobNav();openPanel('wishlist')">Wishlist</a>
+  <a class="mob-nav-link" href="#" onclick="closeMobNav();openPanel('profile')" id="mobProfile" style="display:none">Profile</a>
+  <a class="mob-nav-link" href="#" id="mobAdminLink" style="display:none;color:var(--gold)" onclick="closeMobNav();openAdmin()">⚙️ Admin</a>
+  <div class="mob-nav-actions">
+    <button class="mob-nav-btn primary" id="mobSignIn" onclick="closeMobNav();openAuthModal(null)">Sign In</button>
+    <button class="mob-nav-btn ghost" id="mobSignUp" onclick="closeMobNav();switchTab('signup');openAuthModal(null)">Create Account</button>
+    <button class="mob-nav-btn ghost" id="mobSignOut" style="display:none;color:var(--red)" onclick="closeMobNav();signOut()">Sign Out</button>
+  </div>
+</div>
 
 <!-- HERO SLIDESHOW -->
 <section class="hero" id="home">
@@ -1587,12 +1815,27 @@ img, video, canvas {
     updateNavbar();
   });
 
-  // ── NAVBAR: switch between Sign In button and User menu ──────────
+  // ── MOBILE NAV ────────────────────────────────────────────────────
+  function openMobNav() {
+    document.getElementById('mobNavDrawer').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeMobNav() {
+    document.getElementById('mobNavDrawer').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ── NAVBAR ────────────────────────────────────────────────────────
   function updateNavbar() {
-    const signInEl = document.getElementById('navSignIn');
-    const userEl   = document.getElementById('navUser');
+    const signInEl  = document.getElementById('navSignIn');
+    const userEl    = document.getElementById('navUser');
+    const mobSignIn  = document.getElementById('mobSignIn');
+    const mobSignUp  = document.getElementById('mobSignOut') ? document.getElementById('mobSignOut') : null;
+    const mobSignOut = document.getElementById('mobSignOut');
+    const mobProfile = document.getElementById('mobProfile');
     const footerSignIn   = document.getElementById('footerSignIn');
     const footerRegister = document.getElementById('footerRegister');
+
     if (currentUser) {
       signInEl.style.display = 'none';
       userEl.style.display   = 'block';
@@ -1600,22 +1843,41 @@ img, video, canvas {
       const label = name.split(' ')[0];
       document.getElementById('userName').textContent   = label.split('@')[0];
       document.getElementById('userAvatar').textContent = label[0].toUpperCase();
-      // Hide sign in / register in footer when logged in
+
+      // Mobile drawer: hide sign in/up, show sign out + profile
+      if (document.getElementById('mobSignIn'))  document.getElementById('mobSignIn').style.display  = 'none';
+      if (document.getElementById('mobSignUp2')) document.getElementById('mobSignUp2').style.display = 'none';
+      // find the create account button
+      const allMobBtns = document.querySelectorAll('.mob-nav-btn');
+      allMobBtns.forEach(b => { if (b.textContent.includes('Create Account')) b.style.display = 'none'; });
+      if (mobSignOut)  mobSignOut.style.display  = 'block';
+      if (mobProfile)  mobProfile.style.display  = 'block';
+
       if (footerSignIn)   footerSignIn.style.display   = 'none';
       if (footerRegister) footerRegister.style.display = 'none';
-      // Check if admin
+
       supabaseClient.from('profiles').select('is_organizer').eq('id', currentUser.id).single()
         .then(({ data }) => {
-          const adminLink = document.getElementById('adminLink');
-          if (adminLink) adminLink.style.display = data?.is_organizer ? 'flex' : 'none';
+          const adminLink    = document.getElementById('adminLink');
+          const mobAdminLink = document.getElementById('mobAdminLink');
+          const isAdmin      = data?.is_organizer;
+          if (adminLink)    adminLink.style.display    = isAdmin ? 'flex'  : 'none';
+          if (mobAdminLink) mobAdminLink.style.display = isAdmin ? 'block' : 'none';
         });
     } else {
       signInEl.style.display = 'block';
       userEl.style.display   = 'none';
+      if (document.getElementById('mobSignIn'))  document.getElementById('mobSignIn').style.display  = 'block';
+      const allMobBtns = document.querySelectorAll('.mob-nav-btn');
+      allMobBtns.forEach(b => { if (b.textContent.includes('Create Account')) b.style.display = 'block'; });
+      if (mobSignOut)  mobSignOut.style.display  = 'none';
+      if (mobProfile)  mobProfile.style.display  = 'none';
       if (footerSignIn)   footerSignIn.style.display   = 'block';
       if (footerRegister) footerRegister.style.display = 'block';
-      const adminLink = document.getElementById('adminLink');
-      if (adminLink) adminLink.style.display = 'none';
+      const adminLink    = document.getElementById('adminLink');
+      const mobAdminLink = document.getElementById('mobAdminLink');
+      if (adminLink)    adminLink.style.display    = 'none';
+      if (mobAdminLink) mobAdminLink.style.display = 'none';
     }
   }
 
@@ -3263,24 +3525,25 @@ img, video, canvas {
   // ── THEME TOGGLE ──────────────────────────────────────────────────
   function toggleTheme() {
     const isLight = document.body.classList.toggle('light-mode');
-    const knob    = document.getElementById('themeKnob');
-    knob.textContent = isLight ? '☀️' : '🌙';
+    const emoji   = isLight ? '☀️' : '🌙';
+    ['themeKnob','themeKnobMob'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = emoji;
+    });
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
   }
 
-  // Light mode is default — only switch to dark if user has explicitly chosen it
+  // Light mode default — only dark if user explicitly chose it
   (function() {
     const saved = localStorage.getItem('theme');
-    const knob  = document.getElementById('themeKnob');
-    if (saved === 'dark') {
-      // User previously chose dark — stay dark
-      document.body.classList.remove('light-mode');
-      if (knob) knob.textContent = '🌙';
-    } else {
-      // Default: light mode
+    const emoji = saved === 'dark' ? '🌙' : '☀️';
+    if (saved !== 'dark') {
       document.body.classList.add('light-mode');
-      if (knob) knob.textContent = '☀️';
     }
+    ['themeKnob','themeKnobMob'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = emoji;
+    });
   })();
 </script>
 <!-- ── ADMIN DASHBOARD ── -->
