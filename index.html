@@ -1022,6 +1022,51 @@ img, video, canvas {
     body.light-mode .admin-loading { color: #5a5a6a; }
     body.light-mode .admin-confirm-box { background: #ffffff; }
     body.light-mode .admin-confirm-no { color: #1a1a1a; }
+    /* ── PASSWORD REQUIREMENTS ── */
+    .pwd-reqs {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 12px 14px; margin-top: 8px;
+      display: none; flex-direction: column; gap: 6px;
+    }
+    .pwd-reqs.show { display: flex; }
+    .pwd-req {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.78rem; color: var(--muted);
+      transition: color 0.2s;
+    }
+    .pwd-req .req-icon {
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 1.5px solid var(--border); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; transition: all 0.2s;
+    }
+    .pwd-req.met { color: var(--green); }
+    .pwd-req.met .req-icon {
+      background: var(--green); border-color: var(--green); color: #fff;
+    }
+    .pwd-req.fail .req-icon {
+      background: rgba(232,93,93,0.15); border-color: var(--red); color: var(--red);
+    }
+    /* Strength bar */
+    .pwd-strength-wrap { margin-top: 4px; }
+    .pwd-strength-bar {
+      height: 3px; border-radius: 2px;
+      background: var(--border); overflow: hidden;
+    }
+    .pwd-strength-fill {
+      height: 100%; border-radius: 2px;
+      width: 0%; transition: width 0.3s, background 0.3s;
+    }
+    .pwd-strength-label {
+      font-size: 0.72rem; margin-top: 4px; font-weight: 600;
+    }
+    /* Match indicator */
+    .pwd-match {
+      font-size: 0.78rem; margin-top: 6px;
+      display: none; align-items: center; gap: 6px;
+    }
+    .pwd-match.show { display: flex; }
+    body.light-mode .pwd-reqs { background: #f5f3ee; }
   </style>
 </head>
 <body>
@@ -1350,11 +1395,24 @@ img, video, canvas {
         </div>
         <div class="profile-field">
           <label>New Password</label>
-          <input type="password" id="cpNew" placeholder="Min 6 characters"/>
+          <input type="password" id="cpNew" placeholder="Create a new password"
+                 oninput="checkPwd('cpNew','cpPwdReqs','cpPwdFill','cpPwdStrLabel','cpConfirmMatch')"/>
+          <div class="pwd-reqs" id="cpPwdReqs">
+            <div class="pwd-req" id="cpReqLen"><span class="req-icon">✓</span>At least 6 characters</div>
+            <div class="pwd-req" id="cpReqUpper"><span class="req-icon">✓</span>One uppercase letter (A–Z)</div>
+            <div class="pwd-req" id="cpReqNum"><span class="req-icon">✓</span>One number (0–9)</div>
+            <div class="pwd-req" id="cpReqSpecial"><span class="req-icon">✓</span>One special character (!@#$…)</div>
+            <div class="pwd-strength-wrap">
+              <div class="pwd-strength-bar"><div class="pwd-strength-fill" id="cpPwdFill"></div></div>
+              <div class="pwd-strength-label" id="cpPwdStrLabel"></div>
+            </div>
+          </div>
         </div>
         <div class="profile-field">
           <label>Confirm New Password</label>
-          <input type="password" id="cpConfirm" placeholder="Repeat new password"/>
+          <input type="password" id="cpConfirm" placeholder="Repeat new password"
+                 oninput="checkMatch('cpNew','cpConfirm','cpConfirmMatch')"/>
+          <div class="pwd-match" id="cpConfirmMatch"></div>
         </div>
         <button class="profile-save" id="cpSaveBtn" onclick="changePassword()" style="background:var(--deep);border:1px solid var(--border);color:var(--white)">Update Password</button>
         <p class="profile-msg" id="cpMsg"></p>
@@ -1413,8 +1471,26 @@ img, video, canvas {
       </div>
       <div class="auth-field">
         <label>Password</label>
-        <input type="password" id="suPassword" placeholder="Min 6 characters"
+        <input type="password" id="suPassword" placeholder="Create a password"
+               oninput="checkPwd('suPassword','suPwdReqs','suPwdFill','suPwdStrLabel','suConfirmMatch')"
                onkeydown="if(event.key==='Enter') handleSignUp()"/>
+        <div class="pwd-reqs" id="suPwdReqs">
+          <div class="pwd-req" id="suReqLen"><span class="req-icon">✓</span>At least 6 characters</div>
+          <div class="pwd-req" id="suReqUpper"><span class="req-icon">✓</span>One uppercase letter (A–Z)</div>
+          <div class="pwd-req" id="suReqNum"><span class="req-icon">✓</span>One number (0–9)</div>
+          <div class="pwd-req" id="suReqSpecial"><span class="req-icon">✓</span>One special character (!@#$…)</div>
+          <div class="pwd-strength-wrap">
+            <div class="pwd-strength-bar"><div class="pwd-strength-fill" id="suPwdFill"></div></div>
+            <div class="pwd-strength-label" id="suPwdStrLabel"></div>
+          </div>
+        </div>
+      </div>
+      <div class="auth-field">
+        <label>Confirm Password</label>
+        <input type="password" id="suConfirm" placeholder="Repeat your password"
+               oninput="checkMatch('suPassword','suConfirm','suConfirmMatch')"
+               onkeydown="if(event.key==='Enter') handleSignUp()"/>
+        <div class="pwd-match" id="suConfirmMatch"></div>
       </div>
       <button class="auth-submit" id="btnSignUp" onclick="handleSignUp()">Create Account</button>
       <p style="text-align:center;color:var(--muted);font-size:0.8rem;margin-top:16px">
@@ -1445,13 +1521,26 @@ img, video, canvas {
       </p>
       <div class="auth-field">
         <label>New Password</label>
-        <input type="password" id="rpPassword" placeholder="Min 6 characters"
+        <input type="password" id="rpPassword" placeholder="Create a new password"
+               oninput="checkPwd('rpPassword','rpPwdReqs','rpPwdFill','rpPwdStrLabel','rpConfirmMatch')"
                onkeydown="if(event.key==='Enter') handleResetPassword()"/>
+        <div class="pwd-reqs" id="rpPwdReqs">
+          <div class="pwd-req" id="rpReqLen"><span class="req-icon">✓</span>At least 6 characters</div>
+          <div class="pwd-req" id="rpReqUpper"><span class="req-icon">✓</span>One uppercase letter (A–Z)</div>
+          <div class="pwd-req" id="rpReqNum"><span class="req-icon">✓</span>One number (0–9)</div>
+          <div class="pwd-req" id="rpReqSpecial"><span class="req-icon">✓</span>One special character (!@#$…)</div>
+          <div class="pwd-strength-wrap">
+            <div class="pwd-strength-bar"><div class="pwd-strength-fill" id="rpPwdFill"></div></div>
+            <div class="pwd-strength-label" id="rpPwdStrLabel"></div>
+          </div>
+        </div>
       </div>
       <div class="auth-field">
         <label>Confirm Password</label>
         <input type="password" id="rpConfirm" placeholder="Repeat new password"
+               oninput="checkMatch('rpPassword','rpConfirm','rpConfirmMatch')"
                onkeydown="if(event.key==='Enter') handleResetPassword()"/>
+        <div class="pwd-match" id="rpConfirmMatch"></div>
       </div>
       <button class="auth-submit" id="btnReset" onclick="handleResetPassword()">Set New Password</button>
     </div>
@@ -1712,9 +1801,11 @@ img, video, canvas {
     const name     = document.getElementById('suName').value.trim();
     const email    = document.getElementById('suEmail').value.trim();
     const password = document.getElementById('suPassword').value;
+    const confirm  = document.getElementById('suConfirm').value;
 
     if (!name || !email || !password) { showAuthError('Please fill in all fields.'); return; }
-    if (password.length < 6)          { showAuthError('Password must be at least 6 characters.'); return; }
+    if (password.length < 6)  { showAuthError('Password must be at least 6 characters.'); return; }
+    if (password !== confirm) { showAuthError('Passwords do not match.'); return; }
 
     setAuthLoading('btnSignUp', true);
     clearAuthMessages();
@@ -1735,6 +1826,9 @@ img, video, canvas {
     document.getElementById('suName').value     = '';
     document.getElementById('suEmail').value    = '';
     document.getElementById('suPassword').value = '';
+    document.getElementById('suConfirm').value  = '';
+    document.getElementById('suPwdReqs').classList.remove('show');
+    document.getElementById('suConfirmMatch').classList.remove('show');
   }
 
   // ── SLIDESHOW ─────────────────────────────────────────────────────
@@ -2609,6 +2703,70 @@ img, video, canvas {
     t.style.borderLeftColor = color;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // ── PASSWORD REQUIREMENTS CHECKER ────────────────────────────────
+  const pwdRuleMap = {
+    suPassword: { len:'suReqLen', upper:'suReqUpper', num:'suReqNum', special:'suReqSpecial' },
+    rpPassword: { len:'rpReqLen', upper:'rpReqUpper', num:'rpReqNum', special:'rpReqSpecial' },
+    cpNew:      { len:'cpReqLen', upper:'cpReqUpper', num:'cpReqNum', special:'cpReqSpecial' },
+  };
+
+  function checkPwd(inputId, reqsId, fillId, labelId, matchId) {
+    const val    = document.getElementById(inputId).value;
+    const reqs   = document.getElementById(reqsId);
+    const rules  = pwdRuleMap[inputId];
+
+    // Show requirements box
+    reqs.classList.toggle('show', val.length > 0);
+
+    const checks = {
+      len:     val.length >= 6,
+      upper:   /[A-Z]/.test(val),
+      num:     /[0-9]/.test(val),
+      special: /[^A-Za-z0-9]/.test(val),
+    };
+
+    // Update each requirement row
+    Object.entries(checks).forEach(([key, met]) => {
+      const el = document.getElementById(rules[key]);
+      if (!el) return;
+      el.classList.toggle('met', met);
+      el.classList.toggle('fail', val.length > 0 && !met);
+      el.querySelector('.req-icon').textContent = met ? '✓' : '✕';
+    });
+
+    // Strength calculation
+    const score  = Object.values(checks).filter(Boolean).length;
+    const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+    const colors = ['', '#e85d5d', '#e8a84d', '#4ecb71', '#4ecb71'];
+    const pcts   = ['0%', '25%', '50%', '75%', '100%'];
+
+    const fill  = document.getElementById(fillId);
+    const label = document.getElementById(labelId);
+    if (fill)  { fill.style.width = val.length ? pcts[score] : '0%'; fill.style.background = colors[score]; }
+    if (label) { label.textContent = val.length ? labels[score] : ''; label.style.color = colors[score]; }
+
+    // Re-check match if confirm field has value
+    if (matchId) {
+      const confirmMap = { suConfirmMatch:'suConfirm', rpConfirmMatch:'rpConfirm', cpConfirmMatch:'cpConfirm' };
+      const confirmEl  = document.getElementById(confirmMap[matchId]);
+      if (confirmEl && confirmEl.value.length > 0) checkMatch(inputId, confirmMap[matchId], matchId);
+    }
+  }
+
+  function checkMatch(pwdId, confirmId, matchId) {
+    const pwd     = document.getElementById(pwdId).value;
+    const confirm = document.getElementById(confirmId).value;
+    const el      = document.getElementById(matchId);
+    if (!el) return;
+    if (!confirm.length) { el.classList.remove('show'); return; }
+    el.classList.add('show');
+    const match = pwd === confirm;
+    el.style.color   = match ? 'var(--green)' : 'var(--red)';
+    el.innerHTML     = match
+      ? '<span style="font-size:0.9rem">✓</span> Passwords match'
+      : '<span style="font-size:0.9rem">✕</span> Passwords do not match';
   }
 
   // ── INIT ──────────────────────────────────────────────────────────
